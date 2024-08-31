@@ -10,19 +10,19 @@ function LoggedInHome() {
 
   useEffect(() => {
     appwriteService.getPosts().then((post) => {
-      console.log("In get posts ", post);
+      // console.log("In get posts ", post);
       if (post) {
         setPosts(post.documents);
 
         authService.getCurrentUser().then((userData) => {
-          console.log("In post,jsx");
+          // console.log("In post,jsx");
           setCurrUserId(userData.$id);
-          console.log(userData.$id);
+          // console.log(userData.$id);
         });
       }
     });
   }, []);
-  console.log(posts);
+  // console.log(posts);
 
   if (posts?.length == 0) {
     return <LoggedOutHome />;
@@ -39,7 +39,7 @@ function LoggedInHome() {
           ))}
         </div>
         <div className="lg:w-1/3 px-2">
-          <h2 className="text-center font-bold text-[30px] my-4">Your posts</h2>
+          <h2 className="text-center font-bold text-[30px] my-4">Your Posts</h2>
           <div className="flex flex-wrap justify-center">
             {posts.map((post) => (
               (currUserId==post.userId)&&

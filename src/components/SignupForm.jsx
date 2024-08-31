@@ -10,7 +10,7 @@ function SignupForm() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [error, setError] = useState("");
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit,formState: { errors } } = useForm();
 
   const create = async (data) => {
     setError("");
@@ -36,6 +36,9 @@ function SignupForm() {
           </h2>
         </div>
         <div>
+          {/* {error && error.map((err)=>(<p key={Date.now()} className="text-red-600 text-center">{err}</p>))} */}
+          
+          
           {error && <p className="text-red-600 text-center">{error}</p>}
         </div>
 
@@ -75,8 +78,14 @@ function SignupForm() {
                   required
                   autoComplete="email"
                   className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:text-sm sm:leading-6"
-                  {...register("email", { required: true })}
+                  {...register("email", { required: true ,
+                    pattern: {
+                      value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                      message: "Email address must be a valid address",
+                    },
+                  })}
                 />
+                {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
               </div>
             </div>
 
@@ -98,8 +107,16 @@ function SignupForm() {
                   required
                   autoComplete="current-password"
                   className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:text-sm sm:leading-6"
-                  {...register("password", { required: true })}
+                  {...register("password", { required: true, 
+                    pattern: {
+                      value:/^.{8,}$/,
+                      message:
+                        "Password must be at least 8 characters long",
+                    },
+                  
+                  })}
                 />
+                {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
               </div>
             </div>
 

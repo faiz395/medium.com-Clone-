@@ -13,9 +13,9 @@ function EditPost() {
             appwriteService.getPost(slug).then((post)=>{
                 if(post){
                     setPost(post);
-                    console.log("in editpost");
+                    // console.log("in editpost");
                     
-                    console.log(post)
+                    // console.log(post)
                 }
             })
         }
@@ -23,10 +23,10 @@ function EditPost() {
             navigate('/')
         }
     },[slug, navigate])
-    console.log("post val is ");
-    console.log({post});
+    // console.log("post val is ");
+    // console.log({post});
     
-    console.log("Slug val is "+slug);
+    // console.log("Slug val is "+slug);
     
     return post?(
         

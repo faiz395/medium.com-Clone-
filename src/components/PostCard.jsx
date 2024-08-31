@@ -10,7 +10,7 @@ function PostCard({ $id, title, content, featuredImage }) {
   const pContent = parse(truncatedContent + "</div>");
 
   return (
-    <Link to={`/post/${$id}`} className="block group">
+    <Link to={`/post/${$id}`} className="block group my-6">
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center p-4 border rounded-lg hover:shadow-lg transition-shadow duration-300 ease-in-out">
         <div className="flex-grow sm:w-2/3">
           <h2 className="text-lg sm:text-xl text-left font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-300">

@@ -18,7 +18,7 @@ class AuthService{
             const userAccount = await this.account.create(ID.unique(), email, password, name);
 
             if (userAccount) {
-                console.log('In createAccount func: account created successfully in appwrite');
+                // console.log('In createAccount func: account created successfully in appwrite');
                 // call a function to login automatically
         
                 return this.login({ email, password });
@@ -55,8 +55,8 @@ class AuthService{
             // }).finally(() => {
             //     console.log("in FUNC FINALLY");
             // });
-            console.log("In gettcurrentUser details val is mentioned below ");
-            console.log(details);
+            // console.log("In gettcurrentUser details val is mentioned below ");
+            // console.log(details);
             return details;
 
         } catch (error) {

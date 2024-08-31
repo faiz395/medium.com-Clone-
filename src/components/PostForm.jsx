@@ -18,11 +18,11 @@ function PostForm({ post }) {
   const navigate = useNavigate();
   const [isInlineEditor, setInlineEditor] = useState(false);
   const userData = useSelector((state) => state.auth.userData);
-  console.log("in post form UserData is ");
+  // console.log("in post form UserData is ");
   // console.log({userData});
-  console.log("In post form after clik on edit");
-  console.log({post});
-  console.log(post.content);
+  // console.log("In post form after clik on edit");
+  // console.log({post});
+  // console.log(post.content);
   
   
   
@@ -40,8 +40,8 @@ function PostForm({ post }) {
         ...data,
         featuredImage: file ? file.$id : undefined,
       });
-      console.log("DbPost is");
-      console.log(dbPost);
+      // console.log("DbPost is");
+      // console.log(dbPost);
 
       if (dbPost) {
         navigate(`/post/${dbPost.$id}`);

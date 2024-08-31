@@ -19,13 +19,13 @@ function Post() {
     if (slug) {
       appwriteService.getPost(slug).then((post) => {
         if (post) {
-          console.log("in post comp ");
-          console.log(post);
+          // console.log("in post comp ");
+          // console.log(post);
           setPost(post);
 
           authService.getCurrentUser().then((userData) => {
-            console.log("In post,jsx");
-            console.log(isAuthor);
+            // console.log("In post,jsx");
+            // console.log(isAuthor);
 
             if (post && userData) {
               if (post.userId == userData.$id) {
@@ -34,7 +34,7 @@ function Post() {
                 setAuthor(false);
               }
             }
-            console.log(userData.$id);
+            // console.log(userData.$id);
           });
           appwriteService
             .getPosts([Query.equal("userId", post?.userId)])

@@ -11,8 +11,8 @@ function TinyMCE({
   inlineEditor=false,
 }) {
   // const onChange=()=>{}
-  console.log("Default val is ");
-  console.log(defaultValue);
+  // console.log("Default val is ");
+  // console.log(defaultValue);
 
   return (
     <>

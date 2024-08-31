@@ -9,20 +9,20 @@ import { useForm } from "react-hook-form";
 function LoginForm() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit,formState: { errors } } = useForm();
   const [error, setError] = useState("");
 
   const login = async (data) => {
     setError("");
-    console.log(data);
+    // console.log(data);
     try {
       const session = await authService.login(data);
-      console.log(data);
+      // console.log(data);
       if (session) {
         const userData = await authService.getCurrentUser();
-        console.log('In Login.jsx userData is '+userData+" session is "+session);
-        console.log(userData);
-        console.log(session);
+        // console.log('In Login.jsx userData is '+userData+" session is "+session);
+        // console.log(userData);
+        // console.log(session);
         if (userData) {
           dispatch(authLogin(userData));
         }
@@ -53,7 +53,7 @@ function LoginForm() {
           </div>
 
           <div>
-            {error && <p className="text-red-600 text-center">{error}</p>}
+            {/* {errors && <p className="text-red-600 text-center">{errors}</p>} */}
           </div>
           <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
             <form onSubmit={handleSubmit(login)} className="space-y-6">
@@ -74,8 +74,19 @@ function LoginForm() {
                     className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:text-sm sm:leading-6"
                     {...register("email", {
                       required: true,
+                      pattern: {
+                        value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                        message: "Email address must be a valid address",
+                      },
+                      // validate: {
+                      //   matchPatern: (value) =>
+                      //     /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(
+                      //       value
+                      //     ) || "Email address must be a valid address",
+                      // },
                     })}
                   />
+                  {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
                 </div>
               </div>
 
@@ -104,8 +115,16 @@ function LoginForm() {
                     required
                     autoComplete="current-password"
                     className="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-gray-600 sm:text-sm sm:leading-6"
-                    {...register("password", { required: true })}
+                    {...register("password", {
+                      required: "Password is required",
+                      pattern: {
+                        value:/^.{8,}$/,
+                        message:
+                          "Password must be at least 8 characters long",
+                      },
+                    })}
                   />
+                   {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
                 </div>
               </div>
 
