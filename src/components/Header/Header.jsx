@@ -18,7 +18,7 @@ function Header() {
         <div className="min-w-[100%] h-[75px] border-b-2 border-black ">
           <nav className="flex items-center justify-between my-3 ">
             <div className="flex justify-start items-center w-[30%] space-x-4 md:space-x-6">
-              <Link to="/">
+              <Link to={authStatus?'/':'/home'}>
                 <h2 className="font-bold font-serif text-[30px]">Medium</h2>
               </Link>
               {authStatus && (

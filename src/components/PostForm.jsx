@@ -8,6 +8,7 @@ import Container from "./Container.jsx";
 import authService from "@/appwrite/auth.js";
 
 function PostForm({ post }) {
+  
   const { register, handleSubmit, control, getValues } = useForm({
     defaultValues: {
       title: post?.title || "",
@@ -15,20 +16,24 @@ function PostForm({ post }) {
       status: post?.status || "active",
     },
   });
+
   const navigate = useNavigate();
   const [isInlineEditor, setInlineEditor] = useState(false);
-  const userData = useSelector((state) => state.auth.userData);
-  // console.log("in post form UserData is ");
-  // console.log({userData});
-  // console.log("In post form after clik on edit");
+  const userData = useSelector(state => state.auth.userData);
+  console.log("in post form UserData is ");
+  console.log({userData});
+  console.log("In post form after clik on edit");
   // console.log({post});
   // console.log(post.content);
-  
-  
-  
 
   const submit = async (data) => {
-    const userData = await authService.getCurrentUser();
+    // const userData = await authService.getCurrentUser();
+
+    console.log("data val is");
+    console.log(data);
+    console.log("post val is");
+    console.log(post);
+    
     if (post) {
       const file = data.image[0]
         ? await appwriteService.uploadFile(data.image[0])
@@ -74,6 +79,7 @@ function PostForm({ post }) {
       <Container
         className={"bg-white min-h-screen"}
         classNameChild={"md:max-w-[800px]"}
+        widthOfContainer={'max-sm:max-w-[95%] max-w-[80%]'}
       >
         <form onSubmit={handleSubmit(submit)} className="space-y-8 p-6">
          
@@ -92,14 +98,13 @@ function PostForm({ post }) {
               {...register("title", { required: true })}
             />
           </div>
-          <TinyMCE
-            label="Content"
-            name="content"
-            control={control}
-            defaultValues={getValues("content")}
-            {...register("content",{required:true})}
-            
-          />
+            <TinyMCE
+              label="Content"
+              name="content"
+              control={control}
+              defaultValue={getValues("content")}
+              {...register("content",{required:true})}  
+            />
           <div className="w-full flex flex-wrap justify-center mt-8 ">
             <div className="flex items-center justify-between mb-2 ">
               <label
@@ -114,7 +119,7 @@ function PostForm({ post }) {
               name="featuredImage"
               accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
               className="w-auto text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100 focus:outline-none focus:ring-0 border-2 border-black"
-              {...register("image", { required: true })}
+              {...register("image", { required: !post })}
             />
             {post && (
               <div className="w-full mt-4">

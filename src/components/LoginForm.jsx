@@ -53,7 +53,7 @@ function LoginForm() {
           </div>
 
           <div>
-            {/* {errors && <p className="text-red-600 text-center">{errors}</p>} */}
+            {error && <p className="text-red-600 text-center">{error}</p>}
           </div>
           <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
             <form onSubmit={handleSubmit(login)} className="space-y-6">

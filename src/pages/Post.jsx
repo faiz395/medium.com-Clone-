@@ -15,27 +15,28 @@ function Post() {
   const [isAuthor, setAuthor] = useState(false);
   const navigate = useNavigate();
 
+  // const userData = useSelector(state => state.auth.userData);
+
+  // setAuthor(post && userData ? post.userId === userData.$id : false);
+  // const isAuthor = post && userData ? post.userId === userData.$id : false;
+  const userData = useSelector((state) => state.auth.userData);
+  console.log("Prinin iuser datat");
+  console.log(userData);
+  // console.log(userData.user.$id);
+  console.log(post);
+  console.log(post?.content);
+  
+
   useEffect(() => {
     if (slug) {
       appwriteService.getPost(slug).then((post) => {
         if (post) {
-          // console.log("in post comp ");
-          // console.log(post);
+          console.log("in post comp ");
           setPost(post);
+          console.log(post.userId);
+          console.log(userData.$id);
+          setAuthor(post.userId == userData.$id);
 
-          authService.getCurrentUser().then((userData) => {
-            // console.log("In post,jsx");
-            // console.log(isAuthor);
-
-            if (post && userData) {
-              if (post.userId == userData.$id) {
-                setAuthor(true);
-              } else {
-                setAuthor(false);
-              }
-            }
-            // console.log(userData.$id);
-          });
           appwriteService
             .getPosts([Query.equal("userId", post?.userId)])
             .then((posts) => {
@@ -50,7 +51,7 @@ function Post() {
     } else {
       navigate("/");
     }
-  }, [slug, navigate]);
+  }, [slug, navigate, userData]);
 
   const deletePost = () => {
     appwriteService.deletePost(post.$id).then((status) => {
@@ -63,7 +64,11 @@ function Post() {
 
   return post ? (
     <>
-      <Container className={"my-9 "} classNameChild={"md:max-w-[680px]"}>
+      <Container
+        className={"my-9 "}
+        classNameChild={"md:max-w-[680px]"}
+        widthOfContainer={"max-sm:max-w-[85%] max-w-[80%]"}
+      >
         <div>
           <h1 className="text-[32px] leading-[38px] font-bold text-left lg:text-[42px] lg:leading-[52px]">
             {post?.title || "Empty title"}
@@ -78,15 +83,27 @@ function Post() {
           {isAuthor && (
             <div className="flex flex-wrap p-2 right-6 top-6">
               <Link to={`/edit-post/${post.$id}`}>
-                <button className="px-4 py-2 mr-3 text-white rounded-2xl bg-green-500">
+                <button className=" px-4 py-2 mr-3 text-white rounded-2xl bg-green-500">
+                  <span>
+                    <i class="bi bi-pencil-square"></i>
+                  </span>
+                  <span className="max-sm:hidden">
+                  {" "}
                   Edit
+                  </span>
                 </button>
               </Link>
               <button
                 className="px-4 py-2 text-white rounded-2xl bg-red-500"
                 onClick={deletePost}
               >
+                <span>
+                  <i class="bi bi-trash"></i>
+                </span>
+                <span className="max-sm:hidden">
+                {" "}
                 Delete
+                </span>
               </button>
             </div>
           )}
@@ -103,14 +120,16 @@ function Post() {
         </div>
 
         <div className="text-[16px] leading-[24px] text-left py-1 mt-7">
-          <p>More from the same Author</p>
+          <p>More from the same Author:</p>
         </div>
         {/* more posts from same author */}
 
         <div className="flex flex-wrap justify-center m-3">
           {posts &&
             posts.map((post) => (
-              <PostCard2 {...post} className={"w-[300px] m-1"}/>
+              <div key={post.$id}>
+                <PostCard2 {...post} className={"w-[300px] m-1"} />
+              </div>
             ))}
           {/* post card */}
         </div>

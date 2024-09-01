@@ -28,9 +28,9 @@ function LoggedInHome() {
     return <LoggedOutHome />;
   }
   return (
-    <Container>
+    <Container widthOfContainer={'max-sm:max-w-[90%] max-w-[80%]'}>
       <div className="flex flex-wrap">
-        <div className="lg:w-2/3 px-2">
+        <div className="lg:w-2/3 px-1">
           <h2 className="text-center font-bold text-[30px] my-4">All Posts</h2>
           {posts.map((post) => (
             <div key={post.$id}>

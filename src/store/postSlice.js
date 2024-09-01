@@ -20,7 +20,18 @@ const initialState = [
                 "delete(\"user:66ba42f5002de1e674a5\")"
             ],
             "$databaseId": "66b35d8300248b7263db",
-            "$collectionId": "66b35da20035d781d195"
+            "$collectionId": "66b35da20035d781d195",
+            // extra data to be added by me
+            "extra data":{
+                "likes":["userIdsOfPeopleWhoLiked"],
+                "comments":[
+                    {
+                        "userId":"userIdOfPersonWhoCommented",
+                        "comment":"what he/she commented",
+                        "username":"userNameOfPersonWhoCommented"
+                    }
+                ]
+            }
         },
     }
 ]
@@ -33,11 +44,19 @@ const postSlice = createSlice({
         addPost: (state, action) => {
             state.postId = action.payload.postId;
             state.postData = action.payload.postData;
-        },  
-        deletePost: (state, action) => ({
-            ...state,
-            postData:state.postData.filter(post=>post.postId!=action.payload.postId)
-        }),
+        },
+
+        // pass the complete updated post object when calling update post
+        updatePost:(state,action)=>(
+            state.map((postItem)=>(
+                postItem.postId!=action.payload.postId?postItem:action.payload.postItem
+            ))
+        ),
+
+        // pass postId parameter with function when calling delete post function
+        deletePost: (state, action) => (state.filter((postItem)=>(
+            postItem.postId!=action.payload.postId
+        ))),
     }
 })
 

@@ -29,7 +29,9 @@ function App() {
       .getCurrentUser()
       .then((user) => {
         if (user) {
-          dispatch(login({ user }));
+          dispatch(login(user));
+          console.log(user);
+          
         } else {
           dispatch(logout());
         }

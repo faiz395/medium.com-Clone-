@@ -8,27 +8,26 @@ function TinyMCE({
   control,
   label,
   defaultValue = "'Tell Us Your Story...'",
-  inlineEditor=false,
+  inlineEditor = false,
 }) {
-  // const onChange=()=>{}
-  // console.log("Default val is ");
-  // console.log(defaultValue);
+  console.log("Default val is ");
+  console.log(defaultValue);
 
   return (
     <>
-      
       <div className="w-full my-5">
         {label && <label className="inline-block mb-1 pl-1"></label>}
         <Controller
           name={name || "Content"}
           control={control}
+          defaultValue={defaultValue}
           render={({ field: { onChange } }) => (
             <Editor
               inline={inlineEditor}
               apiKey="u1lhbzhz7p30moh40pe7o4ro5o7wllxi7zbnh5cqbmimjyf3"
               initialValue={defaultValue}
               init={{
-                initialValue:defaultValue,
+                initialValue: defaultValue,
                 branding: false,
                 height: 500,
                 menubar: true,

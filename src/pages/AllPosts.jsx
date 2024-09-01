@@ -14,6 +14,7 @@ function AllPosts() {
     
   return (
     <>
+   
         <div className='flex flex-wrap '>
             {
                 posts.map((post)=>(
@@ -23,6 +24,7 @@ function AllPosts() {
                 ))
             }
         </div>
+  
     </>
   )
 }

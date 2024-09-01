@@ -41,7 +41,7 @@ class AuthService{
 
         } catch (error) {
             console.log("Error is Login createEmailSession",error);
-
+            
             throw error;
         }
 
