@@ -12,7 +12,9 @@ import AuthLayout from "./AuthLayout";
 import PostForm from "./PostForm";
 import LogoutBtn from "./LogoutBtn";
 import PostCard2 from "./PostCard2";
-
+import Comments from "./Comments";
+import ProfileBadgeBig from "./ProfileBadgeBig";
+import ProfileBadgeSmall from "./ProfileBadgeSmall";
 export {
     Loader,
     Footer,
@@ -28,5 +30,8 @@ export {
     PostForm,
     LogoutBtn,
     PostCard2,
+    Comments,
+    ProfileBadgeBig,
+    ProfileBadgeSmall,
     
 }

@@ -1,9 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import image from "../assets/bg-1.webp";
 import { Container } from "./index";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
 
 function HeroHome() {
+  const dispatch = useDispatch();
+  const userData = useSelector(state=>state.auth);
+  const [isLoggedIn,setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+  console.log("pritinguserdatafromHeroHome");
+  console.log(userData);
+  
+  useEffect(()=>{
+    if(userData.status){
+      setIsLoggedIn(true);
+    }
+    if(isLoggedIn){
+      navigate('/home')
+    }
+  },[userData]);
+  
+
   return (
     <div>
       <div className="lg:max-h-screen flex flex-col justify-between bg-[#F7F4ED] py-5 md:py-4">
@@ -22,7 +41,7 @@ function HeroHome() {
             </p>
           </div>
           <div>
-            <Link to="/signup">
+            <Link to={isLoggedIn?"/":"/signup"}>
             <button className="text-[22px] font-serif bg-[#1A8917] md:bg-black text-white rounded-full px-[35px] py-[8px] h-auto">
               Start Reading
             </button>

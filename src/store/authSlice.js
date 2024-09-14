@@ -9,7 +9,10 @@ const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers:{
+        // directly pass object of userData
         login:(state, action)=>{
+            // console.log("priting userData ",state);
+            
             state.status=true;
             state.userData=action.payload;
         }, 

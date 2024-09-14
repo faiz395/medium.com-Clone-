@@ -1,64 +1,62 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = [
-    {
-        postId: '',
-        // sample data
-        postData:{
-            "title": "WorkoutGuide",
-            "featuredImage": "66bf3da8002496f519b9",
-            "status": "active",
-            "userId": "66ba42f5002de1e674a5",
-            "content": "<h1><strong>default value</strong></h1>\n<p><strong>jksdjfd</strong></p>",
-            "$id": "workout-guide",
-            "$tenant": "181311",
-            "$createdAt": "2024-08-16T11:53:18.123+00:00",
-            "$updatedAt": "2024-08-16T14:31:10.218+00:00",
-            "$permissions": [
-                "read(\"user:66ba42f5002de1e674a5\")",
-                "update(\"user:66ba42f5002de1e674a5\")",
-                "delete(\"user:66ba42f5002de1e674a5\")"
-            ],
-            "$databaseId": "66b35d8300248b7263db",
-            "$collectionId": "66b35da20035d781d195",
-            // extra data to be added by me
-            "extra data":{
-                "likes":["userIdsOfPeopleWhoLiked"],
-                "comments":[
-                    {
-                        "userId":"userIdOfPersonWhoCommented",
-                        "comment":"what he/she commented",
-                        "username":"userNameOfPersonWhoCommented"
-                    }
-                ]
-            }
-        },
-    }
-]
+    // {
+    //     "postId": "66cf08d0002f785635f1",
+    //     "postData": {
+    //         "title": "What is Next JS and Why Should You Use it?",
+    //         "content": "<p style=\"text-align: left;\">One of the top benefits of learning what is Next.js is the knowledge of how flexible you can become in building, and adapting to online reality. Internally as the provider of&nbsp;<a href=\"https://pagepro.co/services/nextjs-development\" target=\"_blank\" rel=\"noreferrer noopener\">Next js development services</a>, we think it&rsquo;s the single most important advantage in software development, as we can quickly try and test our ideas. If we succeed, we can easily add new features and&nbsp;<strong>react to changes much faster</strong> than ever before to stay competitive. If not, it&rsquo;s easier to rebuild the entire strategy and adapt accordingly.</p>\n<p style=\"text-align: left;\">&nbsp;</p>\n<p style=\"text-align: left;\">Another thing is the way we buy today. That also went crazy.</p>\n<p style=\"text-align: left;\">&nbsp;</p>\n<p style=\"text-align: left;\">",
+    //         "featuredImage": "66cf1a810037d89c107e",
+    //         "status": "active",
+    //         "userId": "66cec83300158c872897",
+    //         "category": "Uncategorized",
+    //         "$id": "66cf08d0002f785635f1",
+    //         "$tenant": "187465",
+    //         "$createdAt": "2024-08-28T11:24:04.363+00:00",
+    //         "$updatedAt": "2024-09-01T20:13:21.407+00:00",
+    //         "$permissions": [
+    //             "read(\"user:66cec83300158c872897\")",
+    //             "update(\"user:66cec83300158c872897\")",
+    //             "delete(\"user:66cec83300158c872897\")"
+    //         ],
+    //         "$databaseId": "66c3489b0021873c518c",
+    //         "$collectionId": "66c349e9000d49889571"
+    //     }
+    // }
+];
+
 
 const postSlice = createSlice({
-    name: 'post',
-    initialState: initialState,
+    name: "post",
+    initialState: [],
     reducers: {
-        // use map in the beginning to add all posts using addPost with useEffect with a condition where post initialstate is empty
-        addPost: (state, action) => {
-            state.postId = action.payload.postId;
-            state.postData = action.payload.postData;
-        },
+      addPost: (state, action) => {
+        const existingPost = state.find(post => post.postId === action.payload.postId);
+        if (!existingPost) {
+          state.push({
+            postId: action.payload.postId,
+            postData: action.payload.postData,
+          });
+        }
+      },
+      updatePost: (state, action) => {
+        return state.map((postItem) =>
+          postItem.postId !== action.payload.postId
+            ? postItem
+            : { ...postItem, postData: action.payload.postData }
+        );
+      },
 
-        // pass the complete updated post object when calling update post
-        updatePost:(state,action)=>(
-            state.map((postItem)=>(
-                postItem.postId!=action.payload.postId?postItem:action.payload.postItem
-            ))
-        ),
-
-        // pass postId parameter with function when calling delete post function
-        deletePost: (state, action) => (state.filter((postItem)=>(
-            postItem.postId!=action.payload.postId
-        ))),
+    //   passed postId string in action.payload
+      deletePost: (state, action) => {
+        console.log("Deleting post with ID:", action.payload);
+        return state.filter((postItem) => postItem.postId !== action.payload);
+      },
+      clearPosts: (state) => {
+        return [];
+      }
     }
-})
-
-export default postSlice.reducer;
-export const { addPost, deletePost } = postSlice.actions;
+  });
+  
+  export const { addPost, deletePost, updatePost, clearPosts } = postSlice.actions;
+  export default postSlice.reducer;

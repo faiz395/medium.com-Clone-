@@ -1,47 +1,157 @@
 import "./App.css";
-import { useEffect, useState } from "react";
-import {
-  AuthLayout,
-  Container,
-  Footer,
-  Header,
-  HeroHome,
-  Loader,
-  LoggedInNav,
-  LoginForm,
-  PostCard,
-  TinyMCE,
-} from "./components/index";
+import { useEffect, useState, useCallback } from "react";
+import { Header, Footer, Loader } from "./components/index";
 import { logout, login } from "./store/authSlice";
-import { useDispatch } from "react-redux";
+import { addPost, clearPosts } from "./store/postSlice";
+import { addLike, removeAllLikes } from "./store/likeSlice";
+import { addFollow,clearFollow } from "./store/followSlice";
+import { useDispatch, useSelector } from "react-redux";
 import authService from "./appwrite/auth";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { LoggedOutHome, Post } from "./pages/index";
-import { Outlet } from "react-router-dom";
+import service from "./appwrite/config";
+import { useNavigate, Outlet } from "react-router-dom";
+import { addComment } from "./store/commentSlice";
+
 
 function App() {
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
+  const posts = useSelector((state) => state.post);
+  const likes = useSelector((state) => state.like);
+  const comments = useSelector(state=>state.comment);
+  const followers = useSelector(state=>state.follow);
+  console.log("fetched comment from store: "+comments);
+  
+  const user = useSelector((state) => state.auth);
+
+  const navigate = useNavigate();
+
+  const fetchFollowers = async ()=>{
+    if(followers.length==0){
+      
+      dispatch(clearFollow());
+      try {
+        const followerDetails = await service.getFollowers();
+        console.log("logfromfetchfollowersinapp.jsx");
+        console.log(followerDetails);
+        if(followerDetails && followerDetails.documents.length>0){
+          followerDetails.documents.forEach(ele=>{
+            dispatch(addFollow(ele));
+          })
+        }
+      } catch (error) {
+        console.log("Error from fetchFollowers",error);
+      }
+    }
+  }
+
+  const fetchPosts = useCallback(
+    async () => {
+      if (posts.length === 0) {
+        try {
+          console.log("Fetching posts...");
+          dispatch(clearPosts());
+          const postVal = await service.getPosts();
+          console.log("Posts fetched:");
+          // console.log(postVal);
+          
+
+          if (postVal && postVal.documents.length > 0) {
+            for (const postData of postVal.documents) {
+              dispatch(
+                addPost({
+                  postId: postData.$id,
+                  postData: postData,
+                })
+              );
+            }
+            // console.log("Showing likes (before check): ", likes);
+            // Fetch likes only if they are not already present
+            // const existingLikes = likes;
+            // console.log("Showing existing likes: ", likes);
+
+            // const user = await authService.getCurrentUser();
+            if (likes.length==0) {
+              try {
+                const likeData = await service.getLikes();
+
+                if (likeData && likeData.documents.length > 0) {
+                  // console.log("Likes data fetched: ", likeData);
+                  // console.log("userdata: ", user);
+                  // console.log("calling dispatch in app.jsx");
+                  // passing array here for response: likeData.documents, but in postSLice is expecting a value
+                  if(Array.isArray(likeData.documents)){
+                    likeData.documents.forEach(data=>{
+                      // console.log("priting foreach data ",data);
+                      
+                      dispatch(
+                        addLike({likeData:data})
+                      );
+                    })
+                  }
+                }
+              } catch (error) {
+                console.error(`Error fetching likes:`, error);
+              }
+              // console.log("Likes state after dispatch and after existing likes: ", likes);
+            }
+
+            if(comments.length==0){
+              try {
+                const commentdata = await service.getComments();
+                console.log("Commentdata ",commentdata);
+                // const commentdata =commentdataUnsorted.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                if(commentdata && commentdata.documents.length>0){
+                  if(Array.isArray(commentdata.documents)){
+                    commentdata.documents.forEach(element => {
+                      console.log("InforeachLoopDispatching comment data", element);
+                      dispatch(addComment({commentData:element}))
+                    });
+                  }
+                }
+              } catch (error) {
+                console.error(`Error fetching comments:`, error);
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching posts:", error);
+        }
+      }
+    },
+    [dispatch, posts.length, likes, comments] // Removed 'likes' dependency from here
+  );
+
+  const fetchUser = useCallback(async () => {
+    try {
+      const currentUser = await authService.getCurrentUser();
+      if (currentUser) {
+        dispatch(login(currentUser));
+        console.log("printing curr user ",currentUser);
+        
+      } else {
+        dispatch(logout());
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      dispatch(logout());
+    } finally {
+      setLoading(false);
+    }
+  }, [dispatch]);
+
+
 
   useEffect(() => {
-    // setLoading(true);
-    authService
-      .getCurrentUser()
-      .then((user) => {
-        if (user) {
-          dispatch(login(user));
-          console.log(user);
-          
-        } else {
-          dispatch(logout());
-        }
-      })
-      .finally(() => setLoading(false));
-  }, []);
+    fetchUser();
+    fetchPosts(); // Removed 'likes' from here
+    fetchFollowers();
+    setLoading(false);
 
-  return (!loading) ? (
-    <div className="h-auto"> 
-      <Header/>
+  }, [fetchPosts, fetchUser]);
+
+  return !loading ? (
+    <div className="h-auto">
+      <Header />
       <main>
         <Outlet />
       </main>

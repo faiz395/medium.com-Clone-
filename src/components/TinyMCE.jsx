@@ -7,7 +7,7 @@ function TinyMCE({
   name,
   control,
   label,
-  defaultValue = "'Tell Us Your Story...'",
+  defaultValue = "Tell Us Your Story...",
   inlineEditor = false,
 }) {
   console.log("Default val is ");

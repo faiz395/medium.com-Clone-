@@ -14,12 +14,12 @@ class Service {
         this.bucket = new Storage(this.client);
     }
 
-    async createPost({ title, content, featuredImage, status="active", userId, category="Uncategorized" }) {
+    async createPost({ title, content, featuredImage, status = "active", postId, userId, category = "Uncategorized" }) {
         try {
             // console.log(slug);
             // console.log(typeof(slug));
 
-            return await this.databases.createDocument(conf.appwriteDatabaseId, conf.appwriteCollectionArticlesId, ID.unique(), { title, content, featuredImage, status, userId, category });
+            return await this.databases.createDocument(conf.appwriteDatabaseId, conf.appwriteCollectionArticlesId, postId, { title, content, featuredImage, status, userId, category });
 
         } catch (error) {
             console.log('error from createpost func in config.js: ', error);
@@ -56,22 +56,130 @@ class Service {
     // instead of giving getPosts I wrote getPost
     async getPosts(queries = [Query.equal("status", "active")]) {
         try {
-            const response= await this.databases.listDocuments(conf.appwriteDatabaseId, conf.appwriteCollectionArticlesId, queries);
+            const response = await this.databases.listDocuments(conf.appwriteDatabaseId, conf.appwriteCollectionArticlesId, queries);
             console.log("in get posts in appwrite ");
-            
+
             console.log(response);
             return response;
-            
+
         } catch (error) {
             console.log('error from getAllPosts func in config.js: ', error);
             return false;
         }
     }
 
-    // Followers Service
-    async addFollower({userId, followerId}){
+    // likes
+    // function to add a like
+    async addLike(postId, userId, likeId) {
         try {
-            const response = await this.databases.createDocument(conf.appwriteDatabaseId,conf.appwriteCollectionFollowersId,ID.unique(),{userId,followerId});
+            const response = await this.databases.createDocument(conf.appwriteDatabaseId, conf.appwriteCollectionLikesId, likeId, {
+                postId,
+                userId,
+                timestamp: new Date(),
+            });
+            return response;
+        } catch (error) {
+            console.log('error from addLike func in config.js: ', error);
+            return false;
+        }
+    }
+
+    // function to remove a like
+    async removeLike(likeId) {
+        try {
+            const response = await this.databases.deleteDocument(conf.appwriteDatabaseId, conf.appwriteCollectionLikesId,likeId);
+            return response;
+
+        } catch (error) {
+            console.log('error from removeLike func in config.js: ', error);
+            return false;
+        }
+    }
+    async getLike(likeId) {
+        try {
+            return await this.databases.getDocument(conf.appwriteDatabaseId, conf.appwriteCollectionLikesId, likeId);
+        } catch (error) {
+            console.log('error from getLike func in config.js: ', error);
+        }
+    }
+    // Fetch likes for a post
+    async getLikes(queries = [Query.equal("status", "active")]) {
+        try {
+           
+            const likes = await this.databases.listDocuments(conf.appwriteDatabaseId, conf.appwriteCollectionLikesId, queries);
+            console.log("retrieved likes from DB sucessfully");
+            
+            return likes;
+        } catch (error) {
+            console.log('error from getLikes func in config.js: ', error);
+            return false;
+        }
+    }
+
+    // comment service:
+    // Example function to add a comment
+    async addComment(postId, userId, userName, commentText, CommentId) {
+        try {
+            const response = await this.databases.createDocument(conf.appwriteDatabaseId, conf.appwriteCollectionCommentsId, CommentId, {
+                postId,
+                userId,
+                userName,
+                commentText,
+                timestamp: new Date(),
+            });
+            return response;
+        } catch (error) {
+            console.log('error from addComment func in config.js: ', error);
+            return false;
+        }
+    }
+
+    // delete comment
+    // delete comment
+    async deleteComment(commentId) {
+        try {
+            const response = await this.databases.deleteDocument(conf.appwriteDatabaseId, conf.appwriteCollectionCommentsId, commentId);
+            return response;
+        } catch (error) {
+            console.log('error from deleteComment func in config.js: ', error);
+            return false;
+        }
+    }
+
+    async updateComment(id, { commentText }) {
+        try {
+            console.log("udatecommentfromappwrite");
+            
+            const response= await this.databases.updateDocument(conf.appwriteDatabaseId, conf.appwriteCollectionCommentsId, id, { commentText });
+            console.log("response from update comment is ",response);
+            return response;
+            
+        } catch (error) {
+            console.log('error from updateComment func in config.js: ', error);
+        }
+    }
+
+    // Fetch comments for a post
+    async getComments() {
+        try {
+            const comments = await this.databases.listDocuments(conf.appwriteDatabaseId, conf.appwriteCollectionCommentsId, [
+                Query.equal('status', "active"),
+                Query.orderDesc('timestamp'), // To get the latest comments first
+            ]);
+            console.log("retrieved comments from DB sucessfully",comments);
+            
+            return comments;
+        } catch (error) {
+            console.log('error from getComments func in config.js: ', error);
+            return false;
+        }
+    }
+
+
+    // Followers Service
+    async addFollower(userId_following, userId_follower) {
+        try {
+            const response = await this.databases.createDocument(conf.appwriteDatabaseId, conf.appwriteCollectionFollowersId, ID.unique(), { userId_following, userId_follower });
             return response;
         } catch (error) {
             console.log('error from addFollower func in config.js: ', error);
@@ -79,17 +187,17 @@ class Service {
         }
     }
 
-    async getFollower({userId,followerId}){
-        queries=[
-            Query.equal('userId',userId),
-            Query.equal('followerId',followerId),
+    async getFollower(userId_following, userId_follower) {
+        queries = [
+            Query.equal('userId', userId),
+            Query.equal('followerId', followerId),
         ];
 
         try {
-            const response = await this.databases.listDocuments(conf.appwriteDatabaseId,conf.appwriteCollectionFollowersId,queries);
+            const response = await this.databases.listDocuments(conf.appwriteDatabaseId, conf.appwriteCollectionFollowersId, queries);
             console.log('Response from getFollower: ');
             console.log(response);
-            
+
             return response;
             // return response[0];
         } catch (error) {
@@ -97,10 +205,10 @@ class Service {
         }
     }
 
-    async getFollowers(userId){
-        queries=[Query.equal('userId',userId)];
+    async getFollowers(queries = [Query.equal('status', 'active')]) {
+        
         try {
-            const response = await this.databases.listDocuments(conf.appwriteDatabaseId,conf.appwriteCollectionFollowersId,queries);
+            const response = await this.databases.listDocuments(conf.appwriteDatabaseId, conf.appwriteCollectionFollowersId, queries);
             console.log('Response from getFollowers: ');
             console.log(response);
             return response;
@@ -109,13 +217,13 @@ class Service {
         }
     }
 
-    async removeFollower({userId,followerId}){
-        const element = this.getFollower({userId,followerId})
-        console.log('removefollower executed and below is the response: ');
-        console.log(element);
-        console.log(element.$id);
+    async removeFollower(id) {
+        // const element = this.getFollower({ userId, followerId })
+        // console.log('removefollower executed and below is the response: ');
+        // console.log(element);
+        // console.log(element.$id);
         try {
-            await this.databases.deleteDocument(conf.appwriteDatabaseId, conf.appwriteCollectionFollowersId, element.$id);
+            await this.databases.deleteDocument(conf.appwriteDatabaseId, conf.appwriteCollectionFollowersId, id);
             return true;
         } catch (error) {
             console.log('error from removeFollower func in config.js: ', error);

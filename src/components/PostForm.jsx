@@ -3,16 +3,18 @@ import { useForm } from "react-hook-form";
 import { TinyMCE } from "./index.js";
 import appwriteService from "@/appwrite/config.js";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector,useDispatch } from "react-redux";
 import Container from "./Container.jsx";
 import authService from "@/appwrite/auth.js";
+import { addPost, updatePost } from "@/store/postSlice.js";
+import { ID } from "appwrite";
 
 function PostForm({ post }) {
   
   const { register, handleSubmit, control, getValues } = useForm({
     defaultValues: {
       title: post?.title || "",
-      content: post?.content || "",
+      content: post?.content || "Tell Us Your Story...",
       status: post?.status || "active",
     },
   });
@@ -23,6 +25,7 @@ function PostForm({ post }) {
   console.log("in post form UserData is ");
   console.log({userData});
   console.log("In post form after clik on edit");
+  const dispatch = useDispatch();
   // console.log({post});
   // console.log(post.content);
 
@@ -45,6 +48,14 @@ function PostForm({ post }) {
         ...data,
         featuredImage: file ? file.$id : undefined,
       });
+
+      dispatch(updatePost({
+        postId:post.$id,
+        postData:{
+          ...data,
+          featuredImage: file ? file.$id : undefined,
+        }
+      }))
       // console.log("DbPost is");
       // console.log(dbPost);
 
@@ -58,11 +69,19 @@ function PostForm({ post }) {
       if (file) {
         const fileId = file.$id;
         data.featuredImage = fileId;
-
+        const postIdVal=ID.unique();
         const dbPost = await appwriteService.createPost({
           ...data,
+          postId:postIdVal,
           userId: userData.$id,
         });
+        console.log("priting dbpost");
+        console.log(dbPost);
+        
+        dispatch(addPost({
+          postId:postIdVal,
+          postData:dbPost,
+        }))
         if (dbPost) {
           navigate(`/post/${dbPost.$id}`);
         }

@@ -8,6 +8,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { LoggedOutHome, Signup, AddPost, EditPost,Post, AllPosts, LoggedInHome, About, Privacy, Terms } from "./pages/index.js";
 import { AuthLayout, LoginForm as Login } from "./components/index.js";
 
+
 const router = createBrowserRouter([
   {
     path: "/",
