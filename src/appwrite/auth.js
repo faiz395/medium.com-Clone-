@@ -75,6 +75,56 @@ class AuthService{
         }
     }
 
+    async updateUserName(name){
+        try{
+            const response = await this.account.updateName(name);
+            return response;
+        }
+        catch(error){
+            console.log("Error is update username in auth.js: ",error);
+            throw error;
+        }
+    }
+
+    async updateProfilePrefs(prefs){
+
+        // 1. upload image - frontend
+
+        // prefs={
+        //     'profileImage':'66d690110034b494832d',
+        //     'pronoun':'him',
+        //     'bio':'hello world from bio!',
+        // }
+
+        //  2. Change name - frontend
+
+        // 3. update prefs
+        try{
+            const response = await this.account.updatePrefs(prefs);
+            return response;
+        }
+        catch(error){
+            console.log("Error is updateprefs in auth.js: ",error);
+            throw error;
+        }
+        
+    }
+
+
+     // list users
+     async getAllTheUsers() {
+        try {
+            const response = await this.functions.createExecution('66e8e1d90031003541f9');
+            const result = JSON.parse(response.response);
+            console.log("response from getAllTheUsers is ", result);
+            return result;
+        } catch (error) {
+            console.log('Error in getAllTheUsers function: ', error);
+            throw error;
+        }
+    }
+    
+
 }
 
 const authService = new AuthService();

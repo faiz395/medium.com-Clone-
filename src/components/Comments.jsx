@@ -63,8 +63,16 @@ const Comments = ({ postId, userData }) => {
           commentText === comment?.commentText
       );
     console.log("prting exiting comments, ", existingComment);
-
-    if (!existingComment) {
+    if(commentText===""){
+      setCommentError("Comment Cannot Be Empty!");
+      setLoaderActive(false);
+    }
+    else if (!existingComment) {
+      console.log("pritigncommentincommenttextfromcomment.jsx",commentText);
+      console.log("its type is ", typeof(commentText));
+      console.log(commentText==="");
+      
+      
       service
         .addComment(
           postId,
@@ -194,7 +202,9 @@ const Comments = ({ postId, userData }) => {
                     </div>
                   </div>
                   <div>
-                    <button
+                    {userData.$id===comment.userId && (<button
+                      // onMouseOver={() => handleEditDeleteComment(comment.$id)}
+                      // onMouseOut={() => handleEditDeleteComment(comment.$id)}
                       onClick={() => handleEditDeleteComment(comment.$id)}
                     >
                       <svg width="25" height="25" class="svgIcon-use">
@@ -203,7 +213,8 @@ const Comments = ({ postId, userData }) => {
                           d="M5 12.5q0 .828.586 1.414.585.585 1.414.586.828 0 1.414-.586.585-.586.586-1.414 0-.828-.586-1.414A1.93 1.93 0 0 0 7 10.5q-.828 0-1.414.586-.585.586-.586 1.414m5.617 0q0 .828.586 1.414.587.585 1.414.586.828 0 1.414-.586t.586-1.414-.586-1.414a1.93 1.93 0 0 0-1.414-.586q-.827 0-1.414.586-.586.586-.586 1.414m5.6 0q0 .828.586 1.414.585.585 1.432.586.827 0 1.413-.586t.587-1.414q0-.828-.587-1.414a1.93 1.93 0 0 0-1.413-.586q-.847 0-1.432.586t-.587 1.414z"
                         ></path>
                       </svg>
-                    </button>
+                    </button>)}
+                    
                   </div>
                 </div>
                 {isEditDeleteEnabled[comment.$id] && (

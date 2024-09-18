@@ -15,6 +15,14 @@ import PostCard2 from "./PostCard2";
 import Comments from "./Comments";
 import ProfileBadgeBig from "./ProfileBadgeBig";
 import ProfileBadgeSmall from "./ProfileBadgeSmall";
+import EditProfile from "./EditProfile";
+import Page404 from "./Page404"
+import PostLoader from "./PostLoader";
+import PostLoaderSingleSkeleton from "./PostLoaderSingleSkeleton";
+import SinglePostSkeleton from "./SinglePostSkeleton";
+import { Hit } from "./Hit";
+import { Search } from "./Search";
+
 export {
     Loader,
     Footer,
@@ -33,5 +41,11 @@ export {
     Comments,
     ProfileBadgeBig,
     ProfileBadgeSmall,
-    
+    EditProfile,   
+    Page404,
+    PostLoader,
+    PostLoaderSingleSkeleton,
+    SinglePostSkeleton,
+    Hit,
+    Search,
 }

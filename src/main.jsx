@@ -5,7 +5,7 @@ import "./index.css";
 import store from "./store/store.js";
 import { Provider } from "react-redux";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { LoggedOutHome, Signup, AddPost, EditPost,Post, AllPosts, LoggedInHome, About, Privacy, Terms } from "./pages/index.js";
+import { LoggedOutHome, Signup, AddPost, EditPost,Post, AllPosts, LoggedInHome, About, Privacy, Terms, EditProfile, SearchPage } from "./pages/index.js";
 import { AuthLayout, LoginForm as Login } from "./components/index.js";
 
 
@@ -100,6 +100,23 @@ const router = createBrowserRouter([
         element: 
           <Terms/>
         
+      },
+      {
+        path: "/edit-profile",
+        element: (
+          <AuthLayout authentication>
+            {" "}
+            <EditProfile />
+          </AuthLayout>
+        ),
+      },
+      {
+        path: "/search",
+        element: (
+          <AuthLayout authentication>
+            <SearchPage/>
+          </AuthLayout>
+        ),
       },
     ],
   },

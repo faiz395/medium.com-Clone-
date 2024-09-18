@@ -9,6 +9,9 @@ import AllPosts from "./AllPosts";
 import About from "./About";
 import Privacy from "./Privacy";
 import Terms from "./Terms";
+import EditProfile from "./EditProfile";
+import PageNotFound from "./PageNotFound";
+import SearchPage from "./SearchPage";
 
 export{
     AddPost,
@@ -22,4 +25,7 @@ export{
     About,
     Privacy,
     Terms,
+    EditProfile,
+    PageNotFound,
+    SearchPage,
 }

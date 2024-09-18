@@ -6,9 +6,9 @@ import parse from "html-react-parser";
 function PostCard({ $id, title, content, featuredImage,likesCount=0, commentsCount=10, pulishdate="13th May"}) {
   // Limit the title and description to a certain character count
   const truncatedTitle =
-    title.length > 60 ? title.substr(0, 60) + "..." : title;
+    title?.length > 60 ? title.substr(0, 60) + "..." : title;
   const truncatedContent =
-    content.length > 120 ? content.substr(0, 120) + "..." : content;
+    content?.length > 120 ? content.substr(0, 120) + "..." : content;
   const pContent = parse(truncatedContent + "</div>");
 
   return (
