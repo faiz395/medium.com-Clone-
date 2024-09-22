@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector,useDispatch } from "react-redux";
 import Container from "./Container.jsx";
 import authService from "@/appwrite/auth.js";
+import { deleteFunctionality, searchFunctionality } from "@/lib/searchFunctionality.js";
 import { addPost, updatePost } from "@/store/postSlice.js";
 import { ID } from "appwrite";
 
@@ -60,6 +61,8 @@ function PostForm({ post }) {
       // console.log(dbPost);
 
       if (dbPost) {
+        deleteFunctionality();
+        searchFunctionality();
         navigate(`/post/${dbPost.$id}`);
       }
     } else {
@@ -83,10 +86,12 @@ function PostForm({ post }) {
           postData:dbPost,
         }))
         if (dbPost) {
+          searchFunctionality();
           navigate(`/post/${dbPost.$id}`);
         }
       }
     }
+
   };
 
   const handleToggle = () => {

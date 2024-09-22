@@ -26,6 +26,7 @@ import {
   getFollowersByuserId,
   getFollowerByuserIdAndFollowerId,
 } from "@/lib/helperFunctions.js";
+import { searchFunctionality, deleteFunctionality } from "@/lib/searchFunctionality.js";
 import service from "@/appwrite/config.js";
 
 function Post() {
@@ -38,13 +39,14 @@ function Post() {
   const dispatch = useDispatch();
   const [likesCount, setLikesCount] = useState(0);
   const [isLoaderActive, setIsLoaderActive] = useState(true);
+  const [authorName, setAuthorName] = useState("");
 
   const userData = useSelector((state) => state.auth.userData);
   const postsData = useSelector((state) => state.post);
   const likesData = useSelector((state) => state.like);
   const commentsData = useSelector((state) => state.comment);
   const followData = useSelector((state) => state.follow);
-  // console.log("likesDatadefaul ",likesData);
+  const userProfileDetails = useSelector((state) => state.userProfile);
 
   const deletePostNow = () => {
     appwriteService
@@ -53,6 +55,8 @@ function Post() {
         if (status) {
           appwriteService.deleteFile(post.featuredImage);
           dispatch(deletePost(post.$id));
+          deleteFunctionality();
+          searchFunctionality();
           navigate("/");
         }
       })
@@ -128,16 +132,15 @@ function Post() {
   //   }
   // };
 
-  
-  useEffect( () => {
+  useEffect(() => {
     // authService.getAllTheUsers()
     // .then((res)=>{
     //   console.log("listingalltheusersfrompost.jsx: ",res);
     // })
     // .catch((err)=>{
-    //   console.log("error is ",err); 
+    //   console.log("error is ",err);
     // })
-    
+
     if (slug) {
       if (postsData) {
         const [result] = postsData.filter(
@@ -147,6 +150,15 @@ function Post() {
         if (result) {
           setPost(result.postData);
           setAuthor(result.postData.userId === userData?.$id);
+
+          console.log("data.Profiledetailsval:",userProfileDetails);
+          console.log('post?.postData?.userId',post);
+          const val = userProfileDetails.filter(
+            (data) => (data?.userId == result?.postData?.userId)
+          );
+          console.log("userPrfolifromloggedinnavisfrombigbadgenew: ", val);
+          const nameVal = val.length > 0 ? val[0] : "";
+          setAuthorName(nameVal?.userName);
 
           const allPosts = postsData?.filter(
             (postVal) => postVal.postData?.userId === result.postData.userId
@@ -175,6 +187,8 @@ function Post() {
       navigate("/");
     }
   }, [slug, navigate, userData, postsData, likesData]);
+
+  // console.log("likesDatadefaul ",likesData);
 
   console.log("post.$id: ", post);
   console.log(typeof post);
@@ -293,14 +307,18 @@ function Post() {
             </div>
 
             {/* comments */}
-            <Comments postId={post.$id} userData={userData} />
+            <Comments
+              postId={post.$id}
+              userData={userData}
+              postAuthorId={post?.postData?.userId}
+            />
 
             <ProfileBadgeBig
               postAuthorId={post?.userId}
               followerId={userData?.$id}
             />
             <div className="text-[16px] leading-[24px] text-left py-1 mt-7">
-              <p>More from the same Author:</p>
+              <p>More from the {authorName || "same Author"}:</p>
             </div>
             {/* more posts from same author */}
 
@@ -315,7 +333,10 @@ function Post() {
                   // console.log(post);
                   // console.log("likesVal priting: ",likesVal);
                   return (
-                    <div key={post.postId} onClick={window.scrollTo(0, 0)}>
+                    <div
+                      key={post.postId}
+                      onClick={() => window.scrollTo(0, 0)}
+                    >
                       <PostCard2
                         {...post.postData}
                         likesCount={likesVal?.length}

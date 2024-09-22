@@ -10,7 +10,7 @@ export const Hit = ({ hit }) => {
   return (
    
     <div className="m-0 max-sm:m-0 bg-white w-full">
-      <Link to={`/post/${hit.objectID}`} className="autocomplete-item">
+      <Link to={`/post/${hit.$id}`} className="autocomplete-item">
         <article className="flex items-center p-4 border-b border-gray-300">
           <div className="flex-shrink-0 w-24 sm:w-32 md:w-48 lg:w-52">
             <img

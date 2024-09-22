@@ -5,6 +5,8 @@ import { getFollowerByuserIdAndFollowerId } from "@/lib/helperFunctions";
 import { useSelector, useDispatch } from "react-redux";
 import service from "@/appwrite/config";
 import { useEffect } from "react";
+import userProfileSlice from "@/store/userProfileSlice.js";
+
 
 // set proper name and imageUrl for profile table as well with a bio
 
@@ -21,7 +23,10 @@ function ProfileBadgeSmall({ postAuthorId, followerId }) {
   const followData = useSelector((state) => state.follow);
   const userDetails = useSelector((state) => state.auth);
   // const [author, setAuthor] = useState({});
-  const [isFollowing, setIsFollowing] = useState(author.isFollowing);
+  const [isFollowing, setIsFollowing] = useState();
+  const userProfileDetails = useSelector(state=>state.userProfile)
+  const [author,setAuthor]=useState({});
+
 
   // useEffect(()=>{
   //   const authorDetails = {
@@ -36,6 +41,14 @@ function ProfileBadgeSmall({ postAuthorId, followerId }) {
   // },[])
 
   const dispatch = useDispatch();
+
+  useEffect(()=>{
+    const val = userProfileDetails.filter(data=>data.userId==postAuthorId)
+    console.log('userPrfolifromloggedinnavis: ',val);
+    
+    setAuthor(val[0]);
+  },[author,userProfileDetails])
+  
   useEffect(() => {
     const followersAvailable = getFollowerByuserIdAndFollowerId(
       postAuthorId,
@@ -45,7 +58,13 @@ function ProfileBadgeSmall({ postAuthorId, followerId }) {
 
     if (followersAvailable.length > 0) {
       // remove it from appwrite and from followSlice
-      setIsFollowing(true);
+      const val = followersAvailable.filter(data=>data.userId_follower==userDetails.userData.$id && data.userId_following==postAuthorId)
+      if(val?.length>0){
+        setIsFollowing(true);
+      }
+      else{
+        setIsFollowing(false);
+      }
     } else {
       setIsFollowing(false);
     }
@@ -86,13 +105,13 @@ function ProfileBadgeSmall({ postAuthorId, followerId }) {
   return (
     <div className="flex justify items-start space-x-4 p-4 bg-white rounded-lg w-full">
       <img
-        src={service.getFilePreview(author.imageUrl)}
+        src={service.getFilePreview(author?.featuredImage || '66e7c497002e325e378a')}
         alt="Author Image"
         className="w-10 h-10 rounded-full"
       />
       <div className="flex flex-col">
         <div className="flex items-center justify w-full">
-          <h4 className="font-semibold text-gray-900">{author.name}</h4>
+          <h4 className="font-semibold text-gray-900">{author?.userName || "sampleName"}</h4>
           {postAuthorId != followerId && (
             <button
               className={`ml-2 text-gray-700  py-1 px-3 rounded-full text-sm hover:bg-gray-300 transition-colors`}
@@ -103,9 +122,9 @@ function ProfileBadgeSmall({ postAuthorId, followerId }) {
           )}
         </div>
         <p className="text-sm text-left text-gray-600">
-          {author.bio.length > 50
-            ? author.bio.substring(0, 50) + "..."
-            : author.bio}
+          {(author?.bio?.length > 50
+            ? author?.bio?.substring(0, 50) + "..."
+            : author?.bio)||'sampleBio, edit your profile from the edit section in menu'}
         </p>
       </div>
     </div>

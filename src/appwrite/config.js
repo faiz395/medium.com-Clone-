@@ -87,7 +87,7 @@ class Service {
     // function to remove a like
     async removeLike(likeId) {
         try {
-            const response = await this.databases.deleteDocument(conf.appwriteDatabaseId, conf.appwriteCollectionLikesId,likeId);
+            const response = await this.databases.deleteDocument(conf.appwriteDatabaseId, conf.appwriteCollectionLikesId, likeId);
             return response;
 
         } catch (error) {
@@ -105,10 +105,10 @@ class Service {
     // Fetch likes for a post
     async getLikes(queries = [Query.equal("status", "active")]) {
         try {
-           
+
             const likes = await this.databases.listDocuments(conf.appwriteDatabaseId, conf.appwriteCollectionLikesId, queries);
             console.log("retrieved likes from DB sucessfully");
-            
+
             return likes;
         } catch (error) {
             console.log('error from getLikes func in config.js: ', error);
@@ -149,11 +149,11 @@ class Service {
     async updateComment(id, { commentText }) {
         try {
             console.log("udatecommentfromappwrite");
-            
-            const response= await this.databases.updateDocument(conf.appwriteDatabaseId, conf.appwriteCollectionCommentsId, id, { commentText });
-            console.log("response from update comment is ",response);
+
+            const response = await this.databases.updateDocument(conf.appwriteDatabaseId, conf.appwriteCollectionCommentsId, id, { commentText });
+            console.log("response from update comment is ", response);
             return response;
-            
+
         } catch (error) {
             console.log('error from updateComment func in config.js: ', error);
         }
@@ -166,8 +166,8 @@ class Service {
                 Query.equal('status', "active"),
                 Query.orderDesc('timestamp'), // To get the latest comments first
             ]);
-            console.log("retrieved comments from DB sucessfully",comments);
-            
+            console.log("retrieved comments from DB sucessfully", comments);
+
             return comments;
         } catch (error) {
             console.log('error from getComments func in config.js: ', error);
@@ -206,7 +206,7 @@ class Service {
     }
 
     async getFollowers(queries = [Query.equal('status', 'active')]) {
-        
+
         try {
             const response = await this.databases.listDocuments(conf.appwriteDatabaseId, conf.appwriteCollectionFollowersId, queries);
             console.log('Response from getFollowers: ');
@@ -230,6 +230,62 @@ class Service {
         }
     }
 
+    async addUserProfile({userId,featuredImage,bio,pronoun,userName,status}) {
+        try {
+            const response = await this.databases.createDocument(conf.appwriteDatabaseId, conf.appwriteCollectionUserProfileId, ID.unique(), {
+                userId,
+                featuredImage,
+                bio,
+                pronoun,
+                userName,
+                status,
+            });
+            return response;
+        } catch (error) {
+            console.log('error from addUserProfile func in config.js: ', error);
+            return false;
+        }
+
+    }
+    async updateUserProfile(id, { userId, featuredImage, bio, pronoun, userName, status }) {
+        try {
+            return await this.databases.updateDocument(conf.appwriteDatabaseId, conf.appwriteCollectionUserProfileId, id, {
+                userId,
+                featuredImage,
+                bio,
+                pronoun,
+                userName,
+                status,
+            });
+        } catch (error) {
+            console.log('error from updateUserProfile func in config.js: ', error);
+        }
+
+    }
+    async deleteUserProfile(id) {
+        try {
+            await this.databases.deleteDocument(conf.appwriteDatabaseId, conf.appwriteCollectionUserProfileId, id);
+            return true;
+        } catch (error) {
+            console.log('error from deleteUserProfile func in config.js: ', error);
+            return false;
+        }
+
+    }
+
+    async getUserProfiles(queries = [Query.equal("status", "active")]) {
+        try {
+            const response = await this.databases.listDocuments(conf.appwriteDatabaseId, conf.appwriteCollectionUserProfileId, queries);
+            console.log("in getUserProfiles in appwrite ");
+            console.log(response);
+            return response;
+
+        } catch (error) {
+            console.log('error from getUserProfiles func in config.js: ', error);
+            return false;
+        }
+    }
+
     // file upload service
     async uploadFile(file) {
         try {
@@ -249,6 +305,8 @@ class Service {
         }
     }
 
+
+
     getFilePreview(fileId) {
         try {
             return this.bucket.getFilePreview(conf.appwriteBucketId, fileId);
@@ -260,7 +318,8 @@ class Service {
         }
     }
 
-   
+
+
 }
 
 

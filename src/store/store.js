@@ -5,6 +5,8 @@ import likeSlice from './likeSlice';
 import { comment } from 'postcss';
 import commentSlice from './commentSlice';
 import followSlice from './followSlice';
+import userProfileSlice from './userProfileSlice';
+
 
 const store = configureStore({
     reducer:{
@@ -13,6 +15,7 @@ const store = configureStore({
         like:likeSlice,
         comment:commentSlice,
         follow:followSlice,
+        userProfile:userProfileSlice,
     }
 })
 

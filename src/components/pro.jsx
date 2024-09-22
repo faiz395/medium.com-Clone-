@@ -5,7 +5,7 @@ import service from "@/appwrite/config";
 import { useSelector, useDispatch } from "react-redux";
 import { updateProfilePrefs } from "@/store/authSlice";
 import { updateProfile, addProfile } from "@/store/userProfileSlice";
-import { SuccessFullSubmissionToster } from "@/components/index";
+
 
 function EditProfile() {
   const [profileImage, setProfileImage] = useState("");
@@ -31,13 +31,12 @@ function EditProfile() {
     setCurrUserProfile(currUserProfileData);
     console.log("userProfileData in useEffect1: ", currUserprofile);
   }, [currUserprofile]);
-  
 
   useEffect(() => {
     // Prepopulate fields with existing user data
     console.log("userProfileData in useEffect2: ", currUserprofile);
     setProfileImage(currUserprofile?.featuredImage || "66e7c497002e325e378a");
-    setName(currUserprofile?.userName || "");
+    setName(currUserprofile?.userName || "sampleName");
     setPronoun(currUserprofile?.pronoun || "");
     setBio(currUserprofile?.bio || "");
   }, [userDetails, currUserprofile]);
@@ -55,95 +54,108 @@ function EditProfile() {
 
   // 1. if not already present then add the values, 1st in the table db and then in userProfileSlice
   // 2. if already present then update the values, 1st in db table and then in userProfileSlice
- // 1. Ensure uploadImageToBucket returns a Promise with the image ID
-const uploadImageToBucket = async () => {
-  try {
-    console.log("1: uploading image");
-    
-    // Check if a new image has been selected
-    if (uploadedFileName) {
-      const fileInput = document.querySelector('input[type="file"]').files[0]; // Get the file object
-      if (fileInput) {
-        // Upload the image file using the uploadFile function from service
-        const uploadResponse = await service.uploadFile(fileInput); // Await the upload
-        if (uploadResponse?.$id) {
-          console.log("Uploaded response is: ", uploadResponse.$id);
-          setProfileImage(uploadResponse.$id); // Update state with the new image ID
-          return uploadResponse.$id; // Return the uploaded image ID
-        } else {
-          throw new Error("Image upload failed.");
+  const uploadImageToBucket= async ()=>{
+    try {
+      // let uploadedImageId = profileImage; // Use existing image if no new image is uploaded
+      console.log("1: uploadingimage");
+      
+      // Check if a new image has been selected
+      if (uploadedFileName) {
+        const fileInput = document.querySelector('input[type="file"]').files[0]; // Get the file object
+        if (fileInput) {
+          // Upload the image file using the uploadFile function from service
+          service.uploadFile(fileInput).then((uploadResponse) => {
+            console.log("uploadedresponseis: ", uploadResponse.$id);
+
+            if (uploadResponse?.$id) {
+              // uploadedImageId = uploadResponse.$id;
+              setProfileImage(uploadResponse.$id); // Store uploaded image ID
+              console.log("profilnameissettonewIdwhereidis:",uploadResponse.$id);
+              return uploadResponse.$id;
+              
+              // dispatch(
+              //   updateProfilePrefs({
+              //     name,
+              //     pronoun,
+              //     bio,
+              //     profileImage: uploadedImageId, // Use the uploaded image ID
+              //   })
+              // );
+            } else {
+              throw new Error("Image upload failed.");
+            }
+          });
         }
       }
-    } else {
-      // No new image uploaded, use the existing image ID
-      return profileImage; 
+
+      // Call authService to update profile preferences
+      // const response = await authService.updateProfilePrefs({
+      //   name,
+      //   pronoun,
+      //   bio,
+      //   profileImage: profileImage, // Use the uploaded image ID
+      // });
+
+      // if (response) {
+      //   setFormSubmitSuccess(true); // Set form submission success
+      // } else {
+      //   console.error("Error updating profile");
+      // }
+    } catch (error) {
+      console.error("Error uploading the profileimage", error);
+      return false;
     }
-  } catch (error) {
-    console.error("Error uploading the profile image", error);
-    return null;
+    return true;
   }
-};
-
-// 2. Modify handleSubmit to wait for image upload before DB update
-const handleSubmit = async () => {
-  setFormIsUpdating(true);
-
-  try {
-    // Wait for the image to be uploaded and get the image ID
-    const uploadedImageId = await uploadImageToBucket(); 
-
-    // Proceed only if we have a valid image ID
-    if (uploadedImageId) {
-      console.log("2: updating in DB");
-
-      if (currUserprofile) {
-        // update in DB and in slice
-        const updatedProfile = {
-          ...currUserprofile,
-          featuredImage: uploadedImageId, // Use the uploaded image ID
-          bio: bio,
-          pronoun: pronoun,
-          userName: name,
-        };
-
-        // Update in DB
-        const res = await service.updateUserProfile(currUserprofile.$id, updatedProfile);
-        console.log("res is ", res);
-
-        // Dispatch the updated profile to Redux
-        dispatch(updateProfile(res));
-      } else {
-        // Add a new profile in DB and in the slice
-        const newProfile = {
-          userId: userDetails?.userData?.$id,
-          featuredImage: uploadedImageId, // Use the uploaded image ID
-          bio: bio,
-          pronoun: pronoun,
-          userName: name,
-          status: "active",
-        };
-
-        const res = await service.addUserProfile({...newProfile});
-        console.log("responseid: ",res);
-        
-        const updatedVal = res;
-
-        // Dispatch the new profile to Redux
-        dispatch(addProfile(updatedVal));
+  // Form submission handler
+  const handleSubmit = async () => {
+    setFormIsUpdating(true);
+   
+    uploadImageToBucket()
+    .then(imageId=>{
+      try {
+        console.log("2: updatingindb");
+  
+        if (currUserprofile) {
+          // update in DB and in slice
+          service
+            .updateUserProfile(currUserprofile.$id, {
+              ...currUserprofile,
+              featuredImage: imageId.$id || profileImage,
+              bio: bio,
+              pronoun: pronoun,
+              userName: name,
+            })
+            .then((res) => {
+              console.log("res is ", res);
+              console.log("sendingdispatchtoupdatefile");
+              
+              dispatch(updateProfile(res));
+            });
+        } else {
+          // add in DB and in slice
+          service
+            .addUserProfile({
+              userId: userDetails?.userData?.$id,
+              featuredImage: profileImage,
+              bio: bio,
+              pronoun: pronoun,
+              userName: name,
+              status: "active",
+            })
+            .then((res) => {
+              const updatedVal = res.documents[0];
+              dispatch(addProfile(updatedVal));
+            });
+        }
+      } catch (error) {
+        throw new Error("DBoruserSlice Add/Update profile failed:", error);
       }
+    })
+    
 
-      // Indicate form submission success
-      setFormSubmitSuccess(true);
-    } else {
-      throw new Error("Image upload failed.");
-    }
-  } catch (error) {
-    console.error("DB or userSlice Add/Update profile failed:", error);
-  } finally {
     setFormIsUpdating(false);
-  }
-};
-
+  };
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md mt-10">
@@ -219,8 +231,8 @@ const handleSubmit = async () => {
         <p className="text-sm text-gray-500 mt-1">{bio.length}/160</p>
       </div>
       {formSubmitSuccess && (
-        <SuccessFullSubmissionToster />
-        // <p className="text-green-500 text-center mt-4">Profile updated successfully!</p>
+        // <SuccessFullSubmissionToster />
+        <p className="text-green-500 text-center mt-4">Profile updated successfully!</p>
       )}
       {/* Save Button */}
       <div className="flex justify-center">

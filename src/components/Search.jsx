@@ -2,14 +2,21 @@ import algoliasearch from 'algoliasearch';
 import "instantsearch.css/themes/satellite.css";
 import { Hits, InstantSearch, SearchBox, Configure } from "react-instantsearch";
 import { Hit } from "./Hit";
-import { useState } from 'react';
-
-
+import { useEffect, useState } from 'react';
+import { searchFunctionality,deleteFunctionality } from '@/lib/searchFunctionality';
 
 const searchClient = algoliasearch('A6775ZQA6S', 'b113d25cab89008c776fe9bca2173b70')
 
 export const Search = ({queryToSearch}) => {
+
+
   const [searchVal, setdSearchVal]= useState(queryToSearch)
+
+  // useEffect(()=>{
+  //   deleteFunctionality();
+  //   searchFunctionality();
+  // },[])
+
   return (
 
     <InstantSearch

@@ -6,7 +6,7 @@ import { ID } from "appwrite";
 import { addComment, deleteComment, updateComment } from "@/store/commentSlice";
 import { Loader } from "./index";
 
-const Comments = ({ postId, userData }) => {
+const Comments = ({ postId, userData,postAuthorId }) => {
   const [commentValues, setCommentValues] = useState([]);
   const [commentText, setCommentText] = useState("");
   const comments = useSelector((state) => state.comment);
@@ -17,8 +17,10 @@ const Comments = ({ postId, userData }) => {
   const [editableCommentText, setEditableCommentText] = useState({});
   const [commentIsUpdating,setCommentIsUpdating] = useState(false);
   const dispatch = useDispatch();
+  const userDetails = useSelector((state) => state.auth);
   const commentsData = useSelector(state=>state.comment);
-
+  const [currUserprofile, setCurrUserProfile] = useState({});
+  const userProfileDetails = useSelector(state=>state.userProfile)
   console.log("Printing comments in comments.jsx outside useEffect", comments);
   console.log("post.$id: in comments", postId);
   console.log("userData in comments.jsx ", userData);
@@ -47,6 +49,11 @@ const Comments = ({ postId, userData }) => {
   //   },
   // ];
   
+  useEffect(()=>{
+    const val = userProfileDetails.filter(data=>data.userId==postAuthorId)
+    console.log('userPrfolifromloggedinnavisfrombigbadge: ',val);
+    setCurrUserProfile(val[0]);
+  },[currUserprofile,userProfileDetails])
 
   const addCommentToStore = () => {
     // Add comment logic here
@@ -183,18 +190,21 @@ const Comments = ({ postId, userData }) => {
       <div>
         {!loaderActive ? (
           commentValues.length > 0 ? (
-            commentValues.map((comment) => (
+            commentValues.map((comment) => {
+              const val= userProfileDetails.filter(ele=>ele.userId===comment.userId);
+              const valToUse=val?.length>0?val[0]:{userName:'SampleName'};
+              return (
               <div key={comment.$id} className="border-b border-gray-200 py-4">
                 <div className="flex items-center mb-2 justify-between">
                   <div className="flex items-center flex-wrap">
                     <div className="bg-gray-300 h-10 w-10 rounded-full flex items-center justify-center mr-3 text-left">
                       <span className="text-gray-700 font-bold">
-                        {comment.userName.charAt(0)}
+                        {valToUse?.userName.charAt(0)}
                       </span>
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-left">
-                        {comment.userName}
+                        {valToUse?.userName}
                       </h3>
                       <p className="text-sm text-gray-500 text-left">
                         {formatDate(comment.timestamp)}
@@ -202,7 +212,7 @@ const Comments = ({ postId, userData }) => {
                     </div>
                   </div>
                   <div>
-                    {userData.$id===comment.userId && (<button
+                    {userData?.$id===comment?.userId && (<button
                       // onMouseOver={() => handleEditDeleteComment(comment.$id)}
                       // onMouseOut={() => handleEditDeleteComment(comment.$id)}
                       onClick={() => handleEditDeleteComment(comment.$id)}
@@ -220,7 +230,7 @@ const Comments = ({ postId, userData }) => {
                 {isEditDeleteEnabled[comment.$id] && (
                   <div className="relative flex flex-col flex-wrap items-end justify-between">
                     <div onClick={()=>handleUpdateComment(comment.$id)} className="cursor-pointer">Edit Response</div>
-                    <div onClick={() => handleDeleteComment(comment.$id)} className="cursor-pointer">
+                    <div onClick={()=>handleDeleteComment(comment.$id)} className="cursor-pointer">
                       Delete Response
                     </div>
                   </div>
@@ -248,7 +258,9 @@ const Comments = ({ postId, userData }) => {
                 </div>
                 ):(<p className="text-gray-800 text-left">{comment.commentText}</p>)}
               </div>
-            ))
+            )
+            }
+          )
           ) : (
             <p>No comments yet for this post.</p>
           )

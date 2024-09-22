@@ -28,7 +28,7 @@ const initialState = [
 
 const postSlice = createSlice({
     name: "post",
-    initialState: [],
+    initialState,
     reducers: {
       addPost: (state, action) => {
         const existingPost = state.find(post => post.postId === action.payload.postId);

@@ -7,6 +7,7 @@ const conf={
     appwriteCollectionFollowersId:String(import.meta.env.VITE_APPWRITE_COLLECTION_ID_FOLLOWERS),
     appwriteCollectionCommentsId:String(import.meta.env.VITE_APPWRITE_COLLECTION_ID_COMMENTS),
     appwriteCollectionLikesId:String(import.meta.env.VITE_APPWRITE_COLLECTION_ID_LIKES),
+    appwriteCollectionUserProfileId:String(import.meta.env.VITE_APPWRITE_COLLECTION_ID_USERPROFILE),
     
     appwriteBucketId:String(import.meta.env.VITE_APPWRITE_BUCKET_ID),
 }

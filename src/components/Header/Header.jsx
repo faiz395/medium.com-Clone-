@@ -1,18 +1,30 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Container, LogoutBtn } from "../index";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import authService from "@/appwrite/auth";
+import userProfileSlice from "@/store/userProfileSlice.js";
 import service from "@/appwrite/config";
 
 function Header() {
   const authStatus = useSelector((state) => state.auth.status);
   const navigate = useNavigate();
+  const [currUserProfile,setCurrUserProfile]=useState({});
   const classVal = !authStatus ? `bg-[#F7F4ED]` : `w-full`;
   const widthOfContainer = authStatus?'max-sm:max-w-[100%] px-2':'max-w-[80%]';
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const userDetails = useSelector((state) => state.auth);
+  const userProfileDetails = useSelector(state=>state.userProfile)
+// console.log("priting userdetailsimageurl",service.getFilePreview(
+//   userDetails?.userData?.prefs?.profileImage
+// ));
+useEffect(()=>{
+  const val = userProfileDetails.filter(data=>data?.userId==userDetails?.userData?.$id)
+  console.log('userPrfolifromloggedinnavis: ',val);
+  
+  setCurrUserProfile(val[0]);
+},[currUserProfile,userProfileDetails])
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -28,7 +40,7 @@ function Header() {
               <h2 className="font-bold font-serif text-[30px] ">Medium</h2>
             </Link>
             {authStatus && (
-              <Link to={"/search"}>
+              <Link className="md:hidden" to={"/search"}>
                 <div className="flex items-center space-x-2 bg-white p-1 rounded-md">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -46,11 +58,7 @@ function Header() {
                       clipRule="evenodd"
                     ></path>
                   </svg>
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    className="p-1 hidden sm:block"
-                  />
+                  
                 </div>
               </Link>
             )}
@@ -78,6 +86,27 @@ function Header() {
             )}
             {authStatus && (
               <>
+                <Link className="max-md:hidden" to={"/search"}>
+                <div className="flex items-center space-x-2 bg-white p-1 rounded-md">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    aria-label="Search"
+                    className="flex-shrink-0"
+                  >
+                    <path
+                      fill="currentColor"
+                      fillRule="evenodd"
+                      d="M4.092 11.06a6.95 6.95 0 1 1 13.9 0 6.95 6.95 0 0 1-13.9 0m6.95-8.05a8.05 8.05 0 1 0 5.13 14.26l3.75 3.75a.56.56 0 1 0 .79-.79l-3.73-3.73A8.05 8.05 0 0 0 11.042 3z"
+                      clipRule="evenodd"
+                    ></path>
+                  </svg>
+                  
+                </div>
+              </Link>
                 <Link to="/add-post" className="flex items-center space-x-2">
                   <div className="md:hidden flex-shrink-0">
                     <svg
@@ -120,9 +149,10 @@ function Header() {
                   </div>
                 </Link>
                 <div className="relative">
+                  
                   <img
                     src={service.getFilePreview(
-                      userDetails?.userData?.prefs?.profileImage || "66e7c497002e325e378a"
+                      currUserProfile?.featuredImage || '66e7c497002e325e378a'
                     )}
                     alt="Profile"
                     className="w-10 h-10 rounded-full cursor-pointer"

@@ -32,7 +32,7 @@
     "html-react-parser": "^5.1.12",
     "instantsearch.css": "^8.5.1",
     "instantsearch.js": "^4.74.1",
-    "lucide-react": "^0.428.0",
+    "lucide-react": "^0.445.0",
     "node-appwrite": "^14.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

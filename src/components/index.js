@@ -22,6 +22,7 @@ import PostLoaderSingleSkeleton from "./PostLoaderSingleSkeleton";
 import SinglePostSkeleton from "./SinglePostSkeleton";
 import { Hit } from "./Hit";
 import { Search } from "./Search";
+import SuccessFullSubmissionToster from "./SuccessFullSubmissionToster";
 
 export {
     Loader,
@@ -48,4 +49,5 @@ export {
     SinglePostSkeleton,
     Hit,
     Search,
+    SuccessFullSubmissionToster,
 }

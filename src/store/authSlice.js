@@ -52,10 +52,13 @@ const authSlice = createSlice({
         logout:(state,action)=>{
             state.status=false;
             state.userData=null;
+        },
+        updateProfilePrefs:(state,action)=>{
+            state.userData.prefs={...action.payload};
         }
     }
 })
 
-export const {login, logout} =authSlice.actions;
+export const {login, logout,updateProfilePrefs} =authSlice.actions;
 export default authSlice.reducer;
 

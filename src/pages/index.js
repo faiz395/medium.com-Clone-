@@ -9,7 +9,7 @@ import AllPosts from "./AllPosts";
 import About from "./About";
 import Privacy from "./Privacy";
 import Terms from "./Terms";
-import EditProfile from "./EditProfile";
+import EditProfilePage from "./EditProfilePage";
 import PageNotFound from "./PageNotFound";
 import SearchPage from "./SearchPage";
 
@@ -25,7 +25,7 @@ export{
     About,
     Privacy,
     Terms,
-    EditProfile,
+    EditProfilePage,
     PageNotFound,
     SearchPage,
 }

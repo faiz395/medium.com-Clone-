@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { addFollow, removeFollow, clearFollow } from "@/store/followSlice.js";
-import { getFollowerByuserIdAndFollowerId } from "@/lib/helperFunctions";
+import { getFollowerByuserIdAndFollowerId,getFollowersByuserId } from "@/lib/helperFunctions";
 import { useSelector, useDispatch } from "react-redux";
 import service from "@/appwrite/config";
 import { useEffect } from "react";
@@ -16,25 +16,45 @@ const author = {
 };
 function ProfileBadgeBig({ postAuthorId, followerId }) {
   // function ProfileBadgeBig({ author }) {
-  const [isFollowing, setIsFollowing] = useState(author.isFollowing);
+  const [isFollowing, setIsFollowing] = useState(false);
   const [followCount, setFollowCount] = useState(0);
   const followData = useSelector((state) => state.follow);
+  const userDetails = useSelector((state) => state.auth);
+
+  const userProfileDetails = useSelector(state=>state.userProfile)
+  const [author,setAuthor]=useState({});
 
   const dispatch = useDispatch();
+  
+  useEffect(()=>{
+    const val = userProfileDetails.filter(data=>data.userId==postAuthorId)
+    console.log('userPrfolifromloggedinnavisfrombigbadge: ',val);
+    setAuthor(val[0]);
+  },[author,userProfileDetails])
+
   useEffect(() => {
     const followersAvailable = getFollowerByuserIdAndFollowerId(
       postAuthorId,
       followerId,
       followData
     );
+    const allFollowersAvailableForThisAuthor = getFollowersByuserId(postAuthorId,followData)
+    console.log("followersavailableare:",followersAvailable);
+    
 
     if (followersAvailable.length > 0) {
       // remove it from appwrite and from followSlice
-      setIsFollowing(true);
+      const val = followersAvailable.filter(data=>data.userId_follower==userDetails.userData.$id && data.userId_following==postAuthorId)
+      if(val?.length>0){
+        setIsFollowing(true);
+      }
+      else{
+        setIsFollowing(false);
+      }
     } else {
       setIsFollowing(false);
     }
-    setFollowCount(followersAvailable?.length || 0);
+    setFollowCount(allFollowersAvailableForThisAuthor?.length || 0);
   }, [followData]);
 
   const handleFollowClick = async () => {
@@ -70,21 +90,19 @@ function ProfileBadgeBig({ postAuthorId, followerId }) {
   };
 
   return (
-    <div className="block md:flex items-center space-x-4 p-6 bg-white rounded-lg shadow-lg w-full">
+    <div className="block md:flex md:justify-between items-center space-x-4 p-6 bg-white rounded-lg shadow-lg w-full">
       <div className="flex flex-col items-center md:items-start">
         <img
-          src={author.imageUrl}
+          src={service.getFilePreview(author?.featuredImage || '66e7c497002e325e378a')}
           alt="Author Image"
           className="w-20 h-20 rounded-full mb-4"
         />
         <h4 className="text-2xl font-bold text-gray-900">
-          Written by {author.name}
+          Written by {author?.userName || "sampleName"}
         </h4>
         <p className="text-sm text-gray-500 mt-2">Followers: {followCount}</p>
         <p className="text-sm text-gray-700 mt-4 text-left">
-          {author.bio.length > 160
-            ? author.bio.substring(0, 160) + "..."
-            : author.bio}
+        {(author?.bio) ||'sampleBio, edit your profile from the edit section in menu'}
         </p>
       </div>
       <div className="flex flex-col items-end justify-center md:ml-auto">

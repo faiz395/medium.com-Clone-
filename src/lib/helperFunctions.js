@@ -39,8 +39,8 @@ export const getDaySuffix = (day) => {
 };
 
 
-export const getFollowersByuserId = (userId,followDetails)=>{
-    
+export const getFollowersByuserId = (userId_following,followDetails)=>{
+    return followDetails.filter(ele=> ele.userId_following==userId_following)
 }
 export const getFollowerByuserIdAndFollowerId = (userId_following,userId_follower,followDetails)=>{
     console.log("pritngfollDetailsfromhelperfunc",followDetails);

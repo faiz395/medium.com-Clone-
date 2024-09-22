@@ -10,9 +10,13 @@ import authService from "./appwrite/auth";
 import service from "./appwrite/config";
 import { useNavigate, Outlet } from "react-router-dom";
 import { addComment } from "./store/commentSlice";
-// import algoliasearch from "algoliasearch"; // Import from 'algoliasearch/lite'
-import { searchFunctionality} from "./lib/searchFunctionality";
+import algoliasearch from "algoliasearch"; // Import from 'algoliasearch/lite'
+import {
+  searchFunctionality,
+  deleteFunctionality,
+} from "./lib/searchFunctionality";
 import parse from "html-react-parser";
+import { addProfile, clearProfile } from "./store/userProfileSlice";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -21,31 +25,18 @@ function App() {
   const likes = useSelector((state) => state.like);
   const comments = useSelector((state) => state.comment);
   const followers = useSelector((state) => state.follow);
+  // const userProfile = useSelector(state=>state.userProfile);
   console.log("fetched comment from store: " + comments);
   const user = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
-  // Initialize Algolia client
-  // const searchClient = algoliasearch(
-  //   "A6775ZQA6S",  // Application ID
-  //   "e8b4a460b4f2f154093c3e2492a48723" // Search-Only API Key
-  // );
+ 
 
-  // // Initialize index
-  // const index = searchClient.initIndex("demo_ecommerce");
-  // fetch('https://alg.li/doc-ecommerce.json')
-  // .then(function(response) {
-  //   return response.json()
-  // })
-  // .then(function(products) {
-  //   return index.saveObjects(products, {
-  //     autoGenerateObjectIDIfNotExist: true
-  //   })
-  // })
-
-  // useEffect(()=>{
-  //   searchFunctionality();
-  // },[])
+  // add all the posts
+  useEffect(() => {
+    deleteFunctionality();
+    searchFunctionality();
+  }, [posts]);
 
   // useEffect(() => {
   //   const uploadToAlgolia = async () => {
@@ -87,6 +78,27 @@ function App() {
         if (followerDetails && followerDetails.documents.length > 0) {
           followerDetails.documents.forEach((ele) => {
             dispatch(addFollow(ele));
+          });
+        }
+      } catch (error) {
+        console.log("Error from fetchFollowers", error);
+      }
+    }
+  };
+
+  const fetchUserProfile = async () => {
+    if (userProfile.length == 0) {
+      dispatch(clearProfile());
+      try {
+        const getUserProfileDetails = await service.getUserProfiles();
+        console.log("logfromfetchuserprofileinapp.jsx");
+        console.log(getUserProfileDetails);
+        if (
+          getUserProfileDetails &&
+          getUserProfileDetails.documents.length > 0
+        ) {
+          getUserProfileDetails.documents.forEach((ele) => {
+            dispatch(addProfile(ele));
           });
         }
       } catch (error) {
@@ -190,9 +202,9 @@ function App() {
   }, [dispatch]);
 
   useEffect(() => {
-    
     fetchUser();
-    fetchPosts(); // Removed 'likes' from here
+    fetchUserProfile();
+    fetchPosts();
     fetchFollowers();
     setLoading(false);
   }, [fetchPosts, fetchUser]);

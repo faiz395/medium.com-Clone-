@@ -1,9 +1,12 @@
 import React from "react";
 import { Container } from "../index.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import service from "@/appwrite/config.js";
+import userProfileSlice from "@/store/userProfileSlice.js";
 
 function LoggedInNav() {
   // const element = <FontAwesomeIcon icon="fa-solid fa-house" />
+  
 
   return (
     <>

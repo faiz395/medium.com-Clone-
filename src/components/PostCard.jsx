@@ -2,8 +2,9 @@ import React from "react";
 import service from "@/appwrite/config.js";
 import { Link } from "react-router-dom";
 import parse from "html-react-parser";
+import Service from "@/appwrite/config.js";
 
-function PostCard({ $id, title, content, featuredImage,likesCount=0, commentsCount=10, pulishdate="13th May"}) {
+function PostCard({ $id, title, content, featuredImage,likesCount=0, commentsCount=10, pulishdate="13th May", profileImage='66e7c497002e325e378a', userName='testUser'}) {
   // Limit the title and description to a certain character count
   const truncatedTitle =
     title?.length > 60 ? title.substr(0, 60) + "..." : title;
@@ -15,6 +16,10 @@ function PostCard({ $id, title, content, featuredImage,likesCount=0, commentsCou
     <Link to={`/post/${$id}`} className="block group my-6">
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center p-4 border rounded-lg hover:shadow-lg transition-shadow duration-300 ease-in-out">
         <div className="flex-grow sm:w-2/3">
+        {/* <div className="flex space-x-2 my-1 items-center">
+        <img src={service.getFilePreview(profileImage)} alt="" className="w-6 rounded-full" />
+        <p className="text-xs">{userName}</p>
+        </div> */}
           <h2 className="text-lg sm:text-xl text-left font-medium text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
             {truncatedTitle}
           </h2>
