@@ -10,7 +10,6 @@ import authService from "./appwrite/auth";
 import service from "./appwrite/config";
 import { useNavigate, Outlet } from "react-router-dom";
 import { addComment } from "./store/commentSlice";
-import algoliasearch from "algoliasearch"; // Import from 'algoliasearch/lite'
 import {
   searchFunctionality,
   deleteFunctionality,
@@ -25,12 +24,10 @@ function App() {
   const likes = useSelector((state) => state.like);
   const comments = useSelector((state) => state.comment);
   const followers = useSelector((state) => state.follow);
-  // const userProfile = useSelector(state=>state.userProfile);
+  const userProfile = useSelector((state) => state.userProfile);
   console.log("fetched comment from store: " + comments);
   const user = useSelector((state) => state.auth);
   const navigate = useNavigate();
-
- 
 
   // add all the posts
   useEffect(() => {
@@ -38,35 +35,26 @@ function App() {
     searchFunctionality();
   }, [posts]);
 
-  // useEffect(() => {
-  //   const uploadToAlgolia = async () => {
-  //     try {
-  //       const articles = await service.getPosts();
-  //       console.log("articles from service: ", articles);
+  const fetchUser = useCallback(async () => {
+    try {
+      const currentUser = await authService.getCurrentUser();
+      if (currentUser) {
+        dispatch(login(currentUser));
+        navigate("/home"); // Redirect to logged-in home
+      } else {
+        dispatch(logout());
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      dispatch(logout());
+    } finally {
+      setLoading(false);
+    }
+  }, [dispatch, navigate]);
 
-  //       const valuesToUpload = articles.documents.map((ele) => ({
-  //         ...ele,
-  //         featuredImage: `https://cloud.appwrite.io/v1/storage/buckets/66c35271002418f1038d/files/${ele.featuredImage}/preview?project=66c33365000fe9ad0224`,
-  //       }));
-
-  //       await index.saveObjects(valuesToUpload, {
-  //         autoGenerateObjectIDIfNotExist: true,
-  //       });
-
-  //       console.log("Algolia upload success");
-  //     } catch (error) {
-  //       console.error("Error uploading to Algolia:", error);
-  //     }
-  //   };
-
-  //   uploadToAlgolia();
-  // }, [index, service]);
-
-  // console.log();
-
-  // const searchFunctionality = async ()=>{
-
-  // }
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
 
   const fetchFollowers = async () => {
     if (followers.length == 0) {
@@ -87,7 +75,7 @@ function App() {
   };
 
   const fetchUserProfile = async () => {
-    if (userProfile.length == 0) {
+    if (userProfile?.length == 0) {
       dispatch(clearProfile());
       try {
         const getUserProfileDetails = await service.getUserProfiles();
@@ -184,41 +172,26 @@ function App() {
     [dispatch, posts.length, likes, comments] // Removed 'likes' dependency from here
   );
 
-  const fetchUser = useCallback(async () => {
-    try {
-      const currentUser = await authService.getCurrentUser();
-      if (currentUser) {
-        dispatch(login(currentUser));
-        console.log("printing curr user ", currentUser);
-      } else {
-        dispatch(logout());
-      }
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      dispatch(logout());
-    } finally {
-      setLoading(false);
-    }
-  }, [dispatch]);
-
   useEffect(() => {
-    fetchUser();
+    // fetchUser();
     fetchUserProfile();
     fetchPosts();
     fetchFollowers();
     setLoading(false);
   }, [fetchPosts, fetchUser]);
 
-  return !loading ? (
-    <div className="h-auto">
-      <Header />
-      <main>
+  return loading ? (
+    <Loader />
+  ) : (
+    <div className="min-h-screen flex flex-col">
+      <div className="w-full block">
+        <Header />
+      </div>
+      <main className="flex-grow">
         <Outlet />
       </main>
       <Footer />
     </div>
-  ) : (
-    <Loader />
   );
 }
 

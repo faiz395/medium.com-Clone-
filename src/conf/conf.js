@@ -10,6 +10,9 @@ const conf={
     appwriteCollectionUserProfileId:String(import.meta.env.VITE_APPWRITE_COLLECTION_ID_USERPROFILE),
     
     appwriteBucketId:String(import.meta.env.VITE_APPWRITE_BUCKET_ID),
+
+    algoliaAppId:String(import.meta.env.VITE_APP_ALGOLIA_APP_ID),
+    algoliaApiKey:String(import.meta.env.VITE_APP_API_KEY),
 }
 
 export default conf;

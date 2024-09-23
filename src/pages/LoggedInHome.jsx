@@ -6,167 +6,221 @@ import {
   PostLoaderSingleSkeleton,
 } from "@/components/index.js";
 import appwriteService from "@/appwrite/config";
-import { LoggedOutHome } from "./index.js";
 import authService from "@/appwrite/auth.js";
-import postSlice from "../store/postSlice.js";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { getLikes, getComments, formatDate } from "@/lib/helperFunctions.js";
 import { PostLoader } from "@/components/index.js";
+import { addPost, clearPosts } from "@/store/postSlice";
+import { addLike } from "@/store/likeSlice";
+import { addComment } from "@/store/commentSlice";
+import { addFollow } from "@/store/followSlice";
 
 function LoggedInHome() {
-  // const [posts, setPosts] = useState([]);
   const [currUserId, setCurrUserId] = useState("");
   const [postsToLoad, setPostsToLoad] = useState([]);
-  const [isLoaderActive, setIsLoaderActive] = useState(true);
-  const postsData = useSelector((state) => state.post);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedFilter, setSelectedFilter] = useState("All Posts");
+  const [currUserPosts,setCurrUserPosts]=useState([]);
 
-  const comments = useSelector((state) => state.comment);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  // console.log("post from store");
-  const [posts, setPosts] = useState([]);
+
+  const postsData = useSelector((state) => state.post);
   const likes = useSelector((state) => state.like);
+  const comments = useSelector((state) => state.comment);
   const userData = useSelector((state) => state.auth);
   const followData = useSelector((state) => state.follow);
-  console.log("Priting like from logged in home");
-  console.log(likes);
-  const [selectedFilter, setSelectedFilter] = useState("All Posts");
 
-  // console.log(postFromStore);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const currentUser = await authService.getCurrentUser();
+        if (currentUser) {
+          setCurrUserId(currentUser.$id);
+          await fetchPosts();
+          await fetchLikes();
+          await fetchComments();
+          await fetchFollowers();
+        } else {
+          navigate("/login");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [navigate]);
+
+  const fetchPosts = async () => {
+    try {
+      const postVal = await appwriteService.getPosts();
+      dispatch(clearPosts());
+      if (postVal && postVal.documents.length > 0) {
+        postVal.documents.forEach((postData) => {
+          dispatch(addPost({ postId: postData.$id, postData }));
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
+
+  const fetchLikes = async () => {
+    try {
+      const likeData = await appwriteService.getLikes();
+      if (likeData && likeData.documents.length > 0) {
+        likeData.documents.forEach((data) => {
+          dispatch(addLike({ likeData: data }));
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching likes:", error);
+    }
+  };
+
+  const fetchComments = async () => {
+    try {
+      const commentData = await appwriteService.getComments();
+      if (commentData && commentData.documents.length > 0) {
+        commentData.documents.forEach((element) => {
+          dispatch(addComment({ commentData: element }));
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    }
+  };
+
+  const fetchFollowers = async () => {
+    try {
+      const followerDetails = await appwriteService.getFollowers();
+      if (followerDetails && followerDetails.documents.length > 0) {
+        followerDetails.documents.forEach((ele) => {
+          dispatch(addFollow(ele));
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching followers:", error);
+    }
+  };
+
   const getAllTheInfluencersBasedOnFollowerdId = (userId) => {
-    // get all the people this userid is following to
-    console.log("getAllTheInfluencersBasedOnFollowerdId", userId);
     const allTheInfluencers = followData
       .filter((ele) => ele.userId_follower === userId)
       .map((val) => val.userId_following);
-    console.log("allTheInfluencersfromfunc", allTheInfluencers);
-
-    // find all the posts from these followers
-    const postsToDisplay = postsData.filter((postVal) =>
+    return postsData.filter((postVal) =>
       allTheInfluencers.includes(postVal.postData.userId)
     );
-    console.log("poststodisplayfromfunc", postsToDisplay);
-    return postsToDisplay;
   };
 
   const loadPosts = (filter) => {
     setSelectedFilter(filter);
-    // Call API or load posts based on filter (e.g., All Posts or Following)
     if (filter === "All Posts") {
-      console.log("Load All Posts");
-      setPosts(postsData);
-      // Load all posts logic here
+      setPostsToLoad(postsData);
     } else if (filter === "Following") {
-      console.log("Load Following Posts");
-      const values = getAllTheInfluencersBasedOnFollowerdId(currUserId);
-      setPosts(values);
-      // Load posts from following logic here
-      // get all the people this user is following to, and load all the posts from then as postdata.userId
+      const followingPosts = getAllTheInfluencersBasedOnFollowerdId(currUserId);
+      setPostsToLoad(followingPosts);
     }
   };
 
   useEffect(() => {
-    // Assuming you have a function to get the current user
-    authService.getCurrentUser().then((userData) => {
-      setCurrUserId(userData.$id);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (currUserId) {
-      setPosts(postsData);
-      loadPosts(selectedFilter); // Trigger loadPosts once currUserId is set
-      setIsLoaderActive(false);
-      setPostsToLoad(
-        postsData.filter((post) => post?.postData?.userId === currUserId)
-      );
+    if (currUserId && postsData && postsData.length > 0) {
+      loadPosts(selectedFilter);
+      const postsForCurrUser = postsData.filter(ele=>ele.postData.userId==currUserId);
+      setCurrUserPosts(postsForCurrUser);
     }
-  }, [currUserId, postsData, selectedFilter, postsToLoad]);
+  }, [currUserId, postsData, selectedFilter,currUserPosts]);
 
-  if (postsData?.length == 0) {
-    return <LoggedOutHome />;
+  if (isLoading) {
+    return (
+    <>
+    <Container widthOfContainer={"max-sm:max-w-[90%] max-w-[80%]"}>
+    <div className="flex flex-wrap">
+    <div className="max-md:w-full lg:w-2/3 px-1 ">
+    
+    <PostLoader /> 
+    </div>
+    <div className="max-mid:w-full lg:w-1/3 px-2  block max-md:hidden">
+    <PostLoaderSingleSkeleton isActive={isLoading} />
+    </div>
+    </div>
+    </Container>
+    </>)
   }
+
   return (
     <Container widthOfContainer={"max-sm:max-w-[90%] max-w-[80%]"}>
       <div className="flex flex-wrap">
         <div className="max-md:w-full lg:w-2/3 px-1 ">
-          {isLoaderActive && <PostLoader isActive={isLoaderActive} />}
+          <>
+            <div className="w-full bg-white p-4 flex  justify-start">
+              <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
+                <button
+                  className={`px-4 py-2 text-sm ${
+                    selectedFilter === "All Posts"
+                      ? "border-b-2 border-black text-black"
+                      : " text-gray-600"
+                  } transition-colors hover:bg-black hover:text-white`}
+                  onClick={() => loadPosts("All Posts")}
+                >
+                  All Posts
+                </button>
 
-          {!isLoaderActive && (
-            <>
-              <div className="w-full bg-white p-4 flex  justify-start">
-                <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
-                  {/* All Posts Tab */}
-                  <button
-                    className={`py-2 px-4  text-sm ${
-                      selectedFilter === "All Posts"
-                        ? "border-b-2 border-black text-black"
-                        : " text-gray-600"
-                    } transition-colors hover:bg-black hover:text-white`}
-                    onClick={() => loadPosts("All Posts")}
-                  >
-                    All Posts
-                  </button>
-
-                  {/* Following Tab */}
-                  <button
-                    className={`py-2 px-4  text-sm ${
-                      selectedFilter === "Following"
-                        ? "border-b-2 border-black text-black"
-                        : " text-gray-600"
-                    } transition-colors hover:bg-black hover:text-white`}
-                    onClick={() => loadPosts("Following")}
-                  >
-                    Following
-                  </button>
-                </div>
+                <button
+                  className={`py-2 px-4  text-sm  ${
+                    selectedFilter === "Following"
+                      ? "border-b-2 border-black text-black"
+                      : "text-gray-600"
+                  }`}
+                  onClick={() => loadPosts("Following")}
+                >
+                  Following
+                </button>
               </div>
-              
-              {posts.length > 0 ? (
-                [...posts]
-                  .sort(
-                    (a, b) =>
-                      new Date(b.postData.$createdAt) -
-                      new Date(a.postData.$createdAt)
-                  )
-                  .map((post) => {
-                    console.log("postVal in map ", post);
-                    const likesVal = getLikes(likes, post?.postId);
-                    console.log("likesVal priting: ", likesVal);
-                    const commentVal = getComments(comments, post?.postId);
-                    console.log("postvalinmap, ", post);
-                    return (
-                      <div key={post.postId}>
+            </div>
+
+            {postsToLoad.length > 0 ? (
+              [...postsToLoad]
+                .sort(
+                  (a, b) =>
+                    new Date(b.postData.$createdAt) -
+                    new Date(a.postData.$createdAt)
+                )
+                .map((post) => {
+                  const likesVal = getLikes(likes, post?.postId);
+                  const commentVal = getComments(comments, post?.postId);
+                  return (
+                    <div key={post.postId}>
                         <PostCard
                           {...post.postData}
                           likesCount={likesVal?.length}
                           commentsCount={commentVal?.length}
                           pulishdate={formatDate(post.postData?.$createdAt)}
+                          
                         />
                       </div>
-                    );
-                  })
-              ) : (
-                <div className="text-center text-lg">
-                  Follow Some People To See Their Posts
-                </div>
-              )}
-            </>
-          )}
+                  );
+                })
+            ) : (
+              <div className="text-center text-lg">
+                Follow Some People To See Their Posts
+              </div>
+            )}
+          </>
         </div>
-        <div className="max-mid:w-full lg:w-1/3 px-2  block max-md:hidden">
-          {isLoaderActive && (
-            <PostLoaderSingleSkeleton isActive={isLoaderActive} />
-          )}
 
-          {!isLoaderActive && (
-            <>
+        <div className="max-mid:w-full lg:w-1/3 px-2  block max-md:hidden">
+          <>
               <h2 className="text-center font-bold text-[30px] my-4">
                 Your Posts
               </h2>
               <div className="flex flex-wrap justify-center">
-                {postsToLoad &&
-                  postsToLoad
+                {currUserPosts.length>0 &&
+                  [...currUserPosts]  
                     .sort(
                       (a, b) =>
                         new Date(b.postData.$createdAt) -
@@ -182,13 +236,13 @@ function LoggedInHome() {
                             {...post.postData}
                             likesCount={likesVal?.length}
                             commentsCount={commentVal?.length}
-                            pulishdate={formatDate(post.postData.$createdAt)}
+                            publishdate={formatDate(post.postData.$createdAt)}
                             className="max-w-[350px]"
                           />
                         </div>
                       );
                     })}
-                {postsToLoad.length == 0 && (
+                {currUserPosts.length == 0 && (
                   <div className="flex flex-col items-center justify-center bg-gray-50 p-8 rounded-lg shadow-lg w-full mx-auto my-10">
                     {/* <!-- Icon or illustration --> */}
                     <div className="mb-6">
@@ -230,7 +284,6 @@ function LoggedInHome() {
                 )}
               </div>
             </>
-          )}
         </div>
       </div>
     </Container>

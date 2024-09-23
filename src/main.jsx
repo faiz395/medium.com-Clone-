@@ -5,9 +5,21 @@ import "./index.css";
 import store from "./store/store.js";
 import { Provider } from "react-redux";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { LoggedOutHome, Signup, AddPost, EditPost,Post, AllPosts, LoggedInHome, About, Privacy, Terms, EditProfilePage, SearchPage } from "./pages/index.js";
+import {
+  LoggedOutHome,
+  Signup,
+  AddPost,
+  EditPost,
+  Post,
+  AllPosts,
+  LoggedInHome,
+  About,
+  Privacy,
+  Terms,
+  EditProfilePage,
+  SearchPage,
+} from "./pages/index.js";
 import { AuthLayout, LoginForm as Login } from "./components/index.js";
-
 
 const router = createBrowserRouter([
   {
@@ -15,108 +27,56 @@ const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: "/home",
-        element:(
-          <AuthLayout authentication={false}>
-          <div className="bg-[#F7F4ED]">
-            <LoggedOutHome />
-          </div>
-          </AuthLayout>
-          ),
+        path: "/",
+        element: <AuthLayout authentication={false}><LoggedOutHome /></AuthLayout>,
       },
       {
-        path: "/",
-        element:(
-          <>
-          <AuthLayout authentication>
-            <LoggedInHome />
-          </AuthLayout>
-          </>
-          ),
+        path: "/home",
+        element: <AuthLayout authentication={true}><LoggedInHome /></AuthLayout>,
       },
       {
         path: "/login",
-        element: (
-          <AuthLayout authentication={false}>
-            <Login />
-          </AuthLayout>
-        ),
+        element: <AuthLayout authentication={false}><Login /></AuthLayout>,
       },
       {
         path: "/signup",
-        element: (
-          <AuthLayout authentication={false}>
-            <Signup />
-          </AuthLayout>
-        ),
+        element: <AuthLayout authentication={false}><Signup /></AuthLayout>,
       },
       {
         path: "/all-posts",
-        element: (
-          <AuthLayout authentication>
-            {" "}
-            <AllPosts />
-          </AuthLayout>
-        ),
+        element: <AuthLayout authentication={true}><AllPosts /></AuthLayout>,
       },
       {
         path: "/add-post",
-        element: (
-          <AuthLayout authentication>
-            {" "}
-            <AddPost />
-          </AuthLayout>
-        ),
+        element: <AuthLayout authentication={true}><AddPost /></AuthLayout>,
       },
       {
         path: "/edit-post/:slug",
-        element: (
-          <AuthLayout authentication>
-            {" "}
-            <EditPost />
-          </AuthLayout>
-        ),
+        element: <AuthLayout authentication={true}><EditPost /></AuthLayout>,
       },
       {
         path: "/post/:slug",
-        element: 
-          <Post />
-        
+        element: <Post />,
       },
       {
         path: "/about",
-        element: 
-          <About/>
-        
+        element: <About />,
       },
       {
         path: "/privacy",
-        element: 
-          <Privacy/>
-        
+        element: <Privacy />,
       },
       {
         path: "/terms",
-        element: 
-          <Terms/>
-        
+        element: <Terms />,
       },
       {
         path: "/edit-profile",
-        element: (
-          <AuthLayout authentication>
-            {" "}
-            <EditProfilePage />
-          </AuthLayout>
-        ),
+        element: <AuthLayout authentication={true}><EditProfilePage /></AuthLayout>,
       },
       {
         path: "/search",
-        element: (
-          <AuthLayout authentication>
-            <SearchPage/>
-          </AuthLayout>
-        ),
+        element: <AuthLayout authentication={true}><SearchPage /></AuthLayout>,
       },
     ],
   },
@@ -125,9 +85,7 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
-      <RouterProvider router={router}>
-        <App />
-      </RouterProvider>
+      <RouterProvider router={router} />
     </Provider>
   </React.StrictMode>
 );
