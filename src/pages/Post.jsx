@@ -186,7 +186,7 @@ function Post() {
     } else {
       navigate("/");
     }
-  }, [slug, navigate, userData, postsData, likesData]);
+  }, [slug, navigate, userData, postsData, likesData,commentsData]);
 
   // console.log("likesDatadefaul ",likesData);
 

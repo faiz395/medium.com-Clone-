@@ -32,11 +32,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/home",
-        element: <AuthLayout authentication={true}><LoggedInHome /></AuthLayout>,
+        element: <AuthLayout authentication={true} ><LoggedInHome /></AuthLayout>,
       },
       {
         path: "/login",
-        element: <AuthLayout authentication={false}><Login /></AuthLayout>,
+        element: <AuthLayout authentication={false} ><Login /></AuthLayout>,
       },
       {
         path: "/signup",
@@ -44,15 +44,15 @@ const router = createBrowserRouter([
       },
       {
         path: "/all-posts",
-        element: <AuthLayout authentication={true}><AllPosts /></AuthLayout>,
+        element: <AuthLayout authentication={true} ><AllPosts /></AuthLayout>,
       },
       {
         path: "/add-post",
-        element: <AuthLayout authentication={true}><AddPost /></AuthLayout>,
+        element: <AuthLayout authentication={true} ><AddPost /></AuthLayout>,
       },
       {
         path: "/edit-post/:slug",
-        element: <AuthLayout authentication={true}><EditPost /></AuthLayout>,
+        element: <AuthLayout authentication={true} ><EditPost /></AuthLayout>,
       },
       {
         path: "/post/:slug",
@@ -72,11 +72,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/edit-profile",
-        element: <AuthLayout authentication={true}><EditProfilePage /></AuthLayout>,
+        element: <AuthLayout authentication={true} ><EditProfilePage /></AuthLayout>,
       },
       {
         path: "/search",
-        element: <AuthLayout authentication={true}><SearchPage /></AuthLayout>,
+        element: <AuthLayout authentication={true} ><SearchPage /></AuthLayout>,
       },
     ],
   },

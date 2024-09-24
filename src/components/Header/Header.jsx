@@ -11,7 +11,7 @@ function Header() {
   const authStatus = useSelector((state) => state.auth.status);
   const navigate = useNavigate();
   const [currUserProfile, setCurrUserProfile] = useState({});
-  const [currProfileActive,setCurrProfileActive]=useState(false);
+  const [currProfileActive,setCurrProfileActive]=useState(true);
   const classVal = !authStatus ? `bg-[#F7F4ED]` : `w-full`;
   const widthOfContainer = authStatus
     ? "max-sm:max-w-[100%] px-2"
@@ -19,23 +19,21 @@ function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const userDetails = useSelector((state) => state.auth);
   const userProfileDetails = useSelector((state) => state.userProfile);
-  // console.log("priting userdetailsimageurl",service.getFilePreview(
-  //   userDetails?.userData?.prefs?.profileImage
-  // ));
+  
   useEffect(() => {
     const val = userProfileDetails.filter(
       (data) => data?.userId == userDetails?.userData?.$id
     );
     console.log("userPrfolifromloggedinnavis: ", val);
-
     setCurrUserProfile(val[0]);
-    if(!currUserProfile?.userName || !currUserProfile?.bio || !currUserProfile?.pronoun || !currUserProfile?.featuredImage){
+    const finalVal= val[0];
+    if(!finalVal?.userName || !finalVal?.bio || !finalVal?.pronoun || !finalVal?.featuredImage){
       setCurrProfileActive(false);
     }
     else{
       setCurrProfileActive(true);
     }
-  }, [currUserProfile, userProfileDetails]);
+  }, [currUserProfile, userProfileDetails,currProfileActive,authStatus]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -56,7 +54,7 @@ function Header() {
         <nav className="flex items-center justify-between my-3 px-4">
           {/* Left side: Logo and Search */}
           <div className="flex items-center space-x-4">
-            <Link to={authStatus ? "/" : "/home"}>
+            <Link to={authStatus ? "/home" : "/"}>
               <h2 className="font-bold font-serif text-[30px] ">Medium</h2>
             </Link>
             {authStatus && (

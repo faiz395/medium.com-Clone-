@@ -8,7 +8,7 @@ import { addFollow, clearFollow } from "./store/followSlice";
 import { useDispatch, useSelector } from "react-redux";
 import authService from "./appwrite/auth";
 import service from "./appwrite/config";
-import { useNavigate, Outlet } from "react-router-dom";
+import { useNavigate, Outlet, useLocation } from "react-router-dom";
 import { addComment } from "./store/commentSlice";
 import {
   searchFunctionality,
@@ -24,16 +24,25 @@ function App() {
   const likes = useSelector((state) => state.like);
   const comments = useSelector((state) => state.comment);
   const followers = useSelector((state) => state.follow);
+  const authStatus = useSelector((state) => state.auth.status);
+
   const userProfile = useSelector((state) => state.userProfile);
   console.log("fetched comment from store: " + comments);
   const user = useSelector((state) => state.auth);
   const navigate = useNavigate();
+
 
   // add all the posts
   useEffect(() => {
     deleteFunctionality();
     searchFunctionality();
   }, [posts]);
+
+  useEffect(() => {
+    if (authStatus) {
+      navigate('/home'); // Redirect to the original URL or "/home"
+    }
+  }, [authStatus, navigate]);
 
   const fetchUser = useCallback(async () => {
     try {
