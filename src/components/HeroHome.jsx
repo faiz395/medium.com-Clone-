@@ -10,8 +10,8 @@ function HeroHome() {
   const userData = useSelector(state=>state.auth);
   const [isLoggedIn,setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
-  console.log("pritinguserdatafromHeroHome");
-  console.log(userData);
+  // console.log("pritinguserdatafromHeroHome");
+  // console.log(userData);
   
   useEffect(()=>{
     if(userData.status){
@@ -24,8 +24,9 @@ function HeroHome() {
   
 
   return (
-    <div>
-      <div className="lg:max-h-screen flex flex-col justify-between bg-[#F7F4ED] py-5 md:py-4">
+    <div className="flex justify-center items-center min-h-screen">
+    <div className="flex-grow">
+      <div className=" flex flex-col justify-between bg-[#F7F4ED] py-5 md:py-4">
         <Container
           classNameChild={"flex flex-col items-start space-y-9 lg: space-y-11"}
           className={" lg:max-h-screen"}
@@ -62,6 +63,7 @@ function HeroHome() {
           }}
         />
       </div>
+    </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState } from "react"; 
 import { Link, useNavigate } from "react-router-dom";
 import { Container } from "./index.js";
-import { login as authLogin, logout } from "@/store/authSlice.js";
+import { login as authLogin } from "@/store/authSlice.js";
 import { useDispatch } from "react-redux";
 import authService from "@/appwrite/auth.js";
 import { useForm } from "react-hook-form";
@@ -9,20 +9,17 @@ import { useForm } from "react-hook-form";
 function LoginForm() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { register, handleSubmit,formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // Loading state
 
   const login = async (data) => {
     setError("");
-    // console.log(data);
+    setIsLoading(true); // Start loading
     try {
       const session = await authService.login(data);
-      // console.log(data);
       if (session) {
         const userData = await authService.getCurrentUser();
-        // console.log('In Login.jsx userData is '+userData+" session is "+session);
-        // console.log(userData);
-        // console.log(session);
         if (userData) {
           dispatch(authLogin(userData));
         }
@@ -31,11 +28,11 @@ function LoginForm() {
     } catch (error) {
       setError(error.message);
     }
+    setIsLoading(false); // Stop loading
   };
 
   return (
     <>
-     
       <Container className={"w-auto"}>
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8 ">
           <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -70,15 +67,13 @@ function LoginForm() {
                         value: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
                         message: "Email address must be a valid address",
                       },
-                      // validate: {
-                      //   matchPatern: (value) =>
-                      //     /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(
-                      //       value
-                      //     ) || "Email address must be a valid address",
-                      // },
                     })}
                   />
-                  {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
+                  {errors.email && (
+                    <p className="text-red-600 text-sm">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -90,14 +85,6 @@ function LoginForm() {
                   >
                     Password
                   </label>
-                  {/* <div className="text-sm">
-                    <a
-                      href="#"
-                      className="font-semibold text-black-600 hover:text-gray-500"
-                    >
-                      Forgot password?
-                    </a>
-                  </div> */}
                 </div>
                 <div className="mt-2">
                   <input
@@ -110,22 +97,30 @@ function LoginForm() {
                     {...register("password", {
                       required: "Password is required",
                       pattern: {
-                        value:/^.{8,}$/,
-                        message:
-                          "Password must be at least 8 characters long",
+                        value: /^.{8,}$/,
+                        message: "Password must be at least 8 characters long",
                       },
                     })}
                   />
-                   {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
+                  {errors.password && (
+                    <p className="text-red-600 text-sm">
+                      {errors.password.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div>
                 <button
                   type="submit"
-                  className="flex w-full justify-center rounded-md bg-gray-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600"
+                  disabled={isLoading} // Disable button during loading
+                  className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                    isLoading
+                      ? "bg-gray-400 cursor-not-allowed" // Loading state style
+                      : "bg-gray-600 hover:bg-gray-500 focus-visible:outline-gray-600"
+                  }`}
                 >
-                  Sign in
+                  {isLoading ? "Signing in..." : "Sign in"}
                 </button>
               </div>
             </form>

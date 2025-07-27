@@ -25,22 +25,22 @@ const commentsSlice = createSlice({
     // Add a comment
     addComment: (state, action) => {
       const {commentData}= action.payload;
-      console.log("pritingcommentdatafromstoreaddcomment ",commentData);
-      console.log("prting nitial state ",state);
+      // console.log("pritingcommentdatafromstoreaddcomment ",commentData);
+      // console.log("prting nitial state ",state);
       
       
       const existingComment = state.length>0 && state.find(
         (comment) => commentData.postId === comment?.postId && commentData.userId === comment?.userId && commentData.commentText === comment?.commentText
       );
-      console.log("existing comments are :",existingComment);
+      // console.log("existing comments are :",existingComment);
       
       if (!existingComment) {
         state.unshift(commentData);
-        console.log("in commentdata pushed ", commentData);
+        // console.log("in commentdata pushed ", commentData);
       }
-      else {
-        console.log("No comment is pushed");
-      }
+      // else {
+      //   // console.log("No comment is pushed");
+      // }
       // const { postId, userId, userName, commentText, timestamp } = action.payload;
       // if (!state[postId]) {
       //   state[postId] = [];

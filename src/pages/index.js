@@ -12,6 +12,7 @@ import Terms from "./Terms";
 import EditProfilePage from "./EditProfilePage";
 import PageNotFound from "./PageNotFound";
 import SearchPage from "./SearchPage";
+import NotFound from "./NotFound";
 
 export{
     AddPost,
@@ -28,4 +29,5 @@ export{
     EditProfilePage,
     PageNotFound,
     SearchPage,
+    NotFound,
 }

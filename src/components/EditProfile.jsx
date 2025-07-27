@@ -21,29 +21,8 @@ function EditProfile() {
   const [currUserprofile, setCurrUserProfile] = useState({});
   const userProfileData = useSelector((state) => state.userProfile);
 
-  useEffect(() => {
-    const currUserProfileDataArray = userProfileData.filter(
-      (ele) => ele.userId == userDetails.userData.$id
-    );
-    const currUserProfileData = currUserProfileDataArray
-      ? currUserProfileDataArray[0]
-      : null;
-    setCurrUserProfile(currUserProfileData);
-    console.log("userProfileData in useEffect1: ", currUserprofile);
-  }, [currUserprofile]);
-  
-
-  useEffect(() => {
-    // Prepopulate fields with existing user data
-    console.log("userProfileData in useEffect2: ", currUserprofile);
-    setProfileImage(currUserprofile?.featuredImage || "66e7c497002e325e378a");
-    setName(currUserprofile?.userName || "");
-    setPronoun(currUserprofile?.pronoun || "");
-    setBio(currUserprofile?.bio || "");
-  }, [userDetails, currUserprofile]);
-
-  // Image upload handler (only for showing preview and filename)
-  const handleImageUpload = (e) => {
+   // Image upload handler (only for showing preview and filename)
+   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
@@ -53,12 +32,34 @@ function EditProfile() {
     }
   };
 
+  useEffect(() => {
+    const currUserProfileDataArray = userProfileData.filter(
+      (ele) => ele.userId == userDetails.userData.$id
+    );
+    const currUserProfileData = currUserProfileDataArray
+      ? currUserProfileDataArray[0]
+      : null;
+    setCurrUserProfile(currUserProfileData);
+    // console.log("userProfileData in useEffect1: ", currUserprofile);
+  }, [currUserprofile, name,pronoun,bio,profileImage,handleImageUpload]);
+  
+  useEffect(() => {
+    // Prepopulate fields with existing user data
+    // console.log("userProfileData in useEffect2: ", currUserprofile);
+    setProfileImage(currUserprofile?.featuredImage || "66e7c497002e325e378a");
+    setName(currUserprofile?.userName || "");
+    setPronoun(currUserprofile?.pronoun || "");
+    setBio(currUserprofile?.bio || "");
+  }, [userDetails, currUserprofile]);
+
+ 
+
   // 1. if not already present then add the values, 1st in the table db and then in userProfileSlice
   // 2. if already present then update the values, 1st in db table and then in userProfileSlice
  // 1. Ensure uploadImageToBucket returns a Promise with the image ID
 const uploadImageToBucket = async () => {
   try {
-    console.log("1: uploading image");
+    // console.log("1: uploading image");
     
     // Check if a new image has been selected
     if (uploadedFileName) {
@@ -67,7 +68,7 @@ const uploadImageToBucket = async () => {
         // Upload the image file using the uploadFile function from service
         const uploadResponse = await service.uploadFile(fileInput); // Await the upload
         if (uploadResponse?.$id) {
-          console.log("Uploaded response is: ", uploadResponse.$id);
+          // console.log("Uploaded response is: ", uploadResponse.$id);
           setProfileImage(uploadResponse.$id); // Update state with the new image ID
           return uploadResponse.$id; // Return the uploaded image ID
         } else {
@@ -94,7 +95,7 @@ const handleSubmit = async () => {
 
     // Proceed only if we have a valid image ID
     if (uploadedImageId) {
-      console.log("2: updating in DB");
+      // console.log("2: updating in DB");
 
       if (currUserprofile) {
         // update in DB and in slice
@@ -108,7 +109,7 @@ const handleSubmit = async () => {
 
         // Update in DB
         const res = await service.updateUserProfile(currUserprofile.$id, updatedProfile);
-        console.log("res is ", res);
+        // console.log("res is ", res);
 
         // Dispatch the updated profile to Redux
         dispatch(updateProfile(res));
@@ -124,7 +125,7 @@ const handleSubmit = async () => {
         };
 
         const res = await service.addUserProfile({...newProfile});
-        console.log("responseid: ",res);
+        // console.log("responseid: ",res);
         
         const updatedVal = res;
 
@@ -137,6 +138,7 @@ const handleSubmit = async () => {
     } else {
       throw new Error("Image upload failed.");
     }
+
   } catch (error) {
     console.error("DB or userSlice Add/Update profile failed:", error);
   } finally {

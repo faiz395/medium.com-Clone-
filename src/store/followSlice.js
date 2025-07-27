@@ -20,7 +20,7 @@ const followSlice=createSlice({
     reducers:{
         addFollow:(state,action)=>{
             const followerDetail = action.payload;
-            console.log("Pritingfollowdetailsfromfollowslice",followerDetail);
+            // console.log("Pritingfollowdetailsfromfollowslice",followerDetail);
             
             const details = state.find(ele=>ele.$id === followerDetail.$id)
             if(!details){

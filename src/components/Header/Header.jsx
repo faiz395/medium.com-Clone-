@@ -24,7 +24,7 @@ function Header() {
     const val = userProfileDetails.filter(
       (data) => data?.userId == userDetails?.userData?.$id
     );
-    console.log("userPrfolifromloggedinnavis: ", val);
+    // console.log("userPrfolifromloggedinnavis: ", val);
     setCurrUserProfile(val[0]);
     const finalVal= val[0];
     if(!finalVal?.userName || !finalVal?.bio || !finalVal?.pronoun || !finalVal?.featuredImage){

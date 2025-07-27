@@ -7,13 +7,13 @@ import service from "@/appwrite/config";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
-const author = {
-  name: "John Doe",
-  imageUrl: "https://avatar.iran.liara.run/public/girl",
-  bio: "A passionate writer who loves sharing knowledge and insights on various topics. Coffee enthusiast.",
-  followerCount: 250,
-  isFollowing: false,
-};
+// const author = {
+//   name: "John Doe",
+//   imageUrl: "https://avatar.iran.liara.run/public/girl",
+//   bio: "A passionate writer who loves sharing knowledge and insights on various topics. Coffee enthusiast.",
+//   followerCount: 250,
+//   isFollowing: false,
+// };
 function ProfileBadgeBig({ postAuthorId, followerId }) {
   // function ProfileBadgeBig({ author }) {
   const [isFollowing, setIsFollowing] = useState(false);
@@ -28,7 +28,7 @@ function ProfileBadgeBig({ postAuthorId, followerId }) {
   
   useEffect(()=>{
     const val = userProfileDetails.filter(data=>data.userId==postAuthorId)
-    console.log('userPrfolifromloggedinnavisfrombigbadge: ',val);
+    // console.log('userPrfolifromloggedinnavisfrombigbadge: ',val);
     setAuthor(val[0]);
   },[author,userProfileDetails])
 
@@ -39,7 +39,7 @@ function ProfileBadgeBig({ postAuthorId, followerId }) {
       followData
     );
     const allFollowersAvailableForThisAuthor = getFollowersByuserId(postAuthorId,followData)
-    console.log("followersavailableare:",followersAvailable);
+    // console.log("followersavailableare:",followersAvailable);
     
 
     if (followersAvailable.length > 0) {
@@ -58,27 +58,27 @@ function ProfileBadgeBig({ postAuthorId, followerId }) {
   }, [followData]);
 
   const handleFollowClick = async () => {
-    console.log("pritingauthorId", postAuthorId);
-    console.log("pritingfollowerId", followerId);
-    console.log("pritingfollowDatafromprofilebadgesmall", followData);
+    // console.log("pritingauthorId", postAuthorId);
+    // console.log("pritingfollowerId", followerId);
+    // console.log("pritingfollowDatafromprofilebadgesmall", followData);
 
     const followersAvailable = await getFollowerByuserIdAndFollowerId(
       postAuthorId,
       followerId,
       followData
     );
-    console.log("followersAvaiabledata", followersAvailable);
+    // console.log("followersAvaiabledata", followersAvailable);
 
     if (followersAvailable.length > 0) {
       // remove it from appwrite and from followSlice
-      console.log("removing follower");
+      // console.log("removing follower");
       followersAvailable.forEach(async (element) => {
         const removeIt = await service.removeFollower(element.$id);
         dispatch(removeFollow(element.$id));
       });
     } else {
       // add followerin appwrite and in followSlice
-      console.log("adding follower");
+      // console.log("adding follower");
 
       const addingFollower = await service.addFollower(
         postAuthorId,

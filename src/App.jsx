@@ -27,7 +27,7 @@ function App() {
   const authStatus = useSelector((state) => state.auth.status);
 
   const userProfile = useSelector((state) => state.userProfile);
-  console.log("fetched comment from store: " + comments);
+  // console.log("fetched comment from store: " + comments);
   const user = useSelector((state) => state.auth);
   const navigate = useNavigate();
 
@@ -70,15 +70,15 @@ function App() {
       dispatch(clearFollow());
       try {
         const followerDetails = await service.getFollowers();
-        console.log("logfromfetchfollowersinapp.jsx");
-        console.log(followerDetails);
+        // console.log("logfromfetchfollowersinapp.jsx");
+        // console.log(followerDetails);
         if (followerDetails && followerDetails.documents.length > 0) {
           followerDetails.documents.forEach((ele) => {
             dispatch(addFollow(ele));
           });
         }
       } catch (error) {
-        console.log("Error from fetchFollowers", error);
+        // console.log("Error from fetchFollowers", error);
       }
     }
   };
@@ -88,8 +88,8 @@ function App() {
       dispatch(clearProfile());
       try {
         const getUserProfileDetails = await service.getUserProfiles();
-        console.log("logfromfetchuserprofileinapp.jsx");
-        console.log(getUserProfileDetails);
+        // console.log("logfromfetchuserprofileinapp.jsx");
+        // console.log(getUserProfileDetails);
         if (
           getUserProfileDetails &&
           getUserProfileDetails.documents.length > 0
@@ -108,10 +108,10 @@ function App() {
     async () => {
       if (posts.length === 0) {
         try {
-          console.log("Fetching posts...");
+          // console.log("Fetching posts...");
           dispatch(clearPosts());
           const postVal = await service.getPosts();
-          console.log("Posts fetched:");
+          // console.log("Posts fetched:");
           // console.log(postVal);
 
           if (postVal && postVal.documents.length > 0) {
@@ -155,15 +155,15 @@ function App() {
             if (comments.length == 0) {
               try {
                 const commentdata = await service.getComments();
-                console.log("Commentdata ", commentdata);
+                // console.log("Commentdata ", commentdata);
                 // const commentdata =commentdataUnsorted.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 if (commentdata && commentdata.documents.length > 0) {
                   if (Array.isArray(commentdata.documents)) {
                     commentdata.documents.forEach((element) => {
-                      console.log(
-                        "InforeachLoopDispatching comment data",
-                        element
-                      );
+                      // console.log(
+                      //   "InforeachLoopDispatching comment data",
+                      //   element
+                      // );
                       dispatch(addComment({ commentData: element }));
                     });
                   }

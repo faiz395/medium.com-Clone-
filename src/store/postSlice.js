@@ -40,6 +40,8 @@ const postSlice = createSlice({
         }
       },
       updatePost: (state, action) => {
+        console.log("updating post in slice!");
+        
         return state.map((postItem) =>
           postItem.postId !== action.payload.postId
             ? postItem
@@ -49,7 +51,7 @@ const postSlice = createSlice({
 
     //   passed postId string in action.payload
       deletePost: (state, action) => {
-        console.log("Deleting post with ID:", action.payload);
+        // console.log("Deleting post with ID:", action.payload);
         return state.filter((postItem) => postItem.postId !== action.payload);
       },
       clearPosts: (state) => {

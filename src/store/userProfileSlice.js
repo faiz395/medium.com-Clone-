@@ -22,7 +22,7 @@ const userProfileSlice = createSlice({
     initialState,
     reducers:{
         addProfile:(state,action)=>{
-            console.log("fromprofilesliceaddedinprofileslice");
+            // console.log("fromprofilesliceaddedinprofileslice");
             const existingValues=state.find(ele=>ele.userId==action.payload.userId)
             if(!existingValues){
                 state.push(action.payload)
@@ -30,7 +30,7 @@ const userProfileSlice = createSlice({
             
         },
         updateProfile:(state,action)=>{
-            console.log("fromprofilesliceupdatedinprofileslice");
+            // console.log("fromprofilesliceupdatedinprofileslice");
             const valueToUpdate=  action.payload;
             return state.map(ele=>ele.$id!=action.payload.$id?ele:{...valueToUpdate})
         },

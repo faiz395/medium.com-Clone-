@@ -12,6 +12,7 @@ export function searchFunctionality() {
             console.log("pritingarticles: ", articles);
             const valuesToUpload = articles?.documents?.map((ele) => ({
                 ...ele,
+                content: ele.content.length<100?ele.content:ele.content.slice(0,200),
                 featuredImage: `https://cloud.appwrite.io/v1/storage/buckets/66c35271002418f1038d/files/${ele.featuredImage}/preview?project=66c33365000fe9ad0224`,
             }));
 

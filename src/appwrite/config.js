@@ -3,7 +3,7 @@ import { Client, Databases, ID, Storage, Query } from "appwrite";
 
 class Service {
     client = new Client();
-    databases;
+    databases;  
     bucket;
     constructor() {
         this.client
@@ -57,9 +57,9 @@ class Service {
     async getPosts(queries = [Query.equal("status", "active")]) {
         try {
             const response = await this.databases.listDocuments(conf.appwriteDatabaseId, conf.appwriteCollectionArticlesId, queries);
-            console.log("in get posts in appwrite ");
+            // console.log("in get posts in appwrite ");
 
-            console.log(response);
+            // console.log(response);
             return response;
 
         } catch (error) {
@@ -107,7 +107,7 @@ class Service {
         try {
 
             const likes = await this.databases.listDocuments(conf.appwriteDatabaseId, conf.appwriteCollectionLikesId, queries);
-            console.log("retrieved likes from DB sucessfully");
+            // console.log("retrieved likes from DB sucessfully");
 
             return likes;
         } catch (error) {
@@ -148,10 +148,10 @@ class Service {
 
     async updateComment(id, { commentText }) {
         try {
-            console.log("udatecommentfromappwrite");
+            // console.log("udatecommentfromappwrite");
 
             const response = await this.databases.updateDocument(conf.appwriteDatabaseId, conf.appwriteCollectionCommentsId, id, { commentText });
-            console.log("response from update comment is ", response);
+            // console.log("response from update comment is ", response);
             return response;
 
         } catch (error) {
@@ -166,7 +166,7 @@ class Service {
                 Query.equal('status', "active"),
                 Query.orderDesc('timestamp'), // To get the latest comments first
             ]);
-            console.log("retrieved comments from DB sucessfully", comments);
+            // console.log("retrieved comments from DB sucessfully", comments);
 
             return comments;
         } catch (error) {
@@ -195,8 +195,8 @@ class Service {
 
         try {
             const response = await this.databases.listDocuments(conf.appwriteDatabaseId, conf.appwriteCollectionFollowersId, queries);
-            console.log('Response from getFollower: ');
-            console.log(response);
+            // console.log('Response from getFollower: ');
+            // console.log(response);
 
             return response;
             // return response[0];
@@ -209,8 +209,8 @@ class Service {
 
         try {
             const response = await this.databases.listDocuments(conf.appwriteDatabaseId, conf.appwriteCollectionFollowersId, queries);
-            console.log('Response from getFollowers: ');
-            console.log(response);
+            // console.log('Response from getFollowers: ');
+            // console.log(response);
             return response;
         } catch (error) {
             console.log('error from getFollowers func in config.js: ', error);
@@ -276,8 +276,22 @@ class Service {
     async getUserProfiles(queries = [Query.equal("status", "active")]) {
         try {
             const response = await this.databases.listDocuments(conf.appwriteDatabaseId, conf.appwriteCollectionUserProfileId, queries);
-            console.log("in getUserProfiles in appwrite ");
-            console.log(response);
+            // console.log("in getUserProfiles in appwrite ");
+            // console.log(response);
+            return response;
+
+        } catch (error) {
+            console.log('error from getUserProfiles func in config.js: ', error);
+            return false;
+        }
+    }
+    async getUserProfile(userid) {
+        try {
+            const response = await this.databases.getDocument(conf.appwriteDatabaseId, conf.appwriteCollectionUserProfileId, 
+                queries = [Query.equal("userId", userid)]
+            );
+            // console.log("in getUserProfiles in appwrite ");
+            // console.log(response);
             return response;
 
         } catch (error) {
@@ -309,8 +323,9 @@ class Service {
 
     getFilePreview(fileId) {
         try {
-            return this.bucket.getFilePreview(conf.appwriteBucketId, fileId);
-
+            // Use the bucket instance to get the file preview URL
+            const res = this.bucket.getFileView(conf.appwriteBucketId, fileId);
+            return res;
         } catch (error) {
             console.log('error from getFilePreview func in config.js: ', error);
             return false;
