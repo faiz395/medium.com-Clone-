@@ -6,15 +6,14 @@ import { getLikes, getComments, formatDate } from "@/lib/helperFunctions.js";
 
 export const Hit = ({ hit }) => {
   console.log('Rendering Hit component with:', hit);
-
+  const finalImage = hit?.featuredImage.includes('preview') ? hit?.featuredImage.replace("preview","view") : hit?.featuredImage;
   return (
-   
     <div className="m-0 max-sm:m-0 bg-white w-full">
       <Link to={`/post/${hit.$id}`} className="autocomplete-item">
         <article className="flex items-center p-4 border-b border-gray-300">
           <div className="flex-shrink-0 w-24 sm:w-32 md:w-48 lg:w-52">
             <img
-              src={hit.featuredImage}
+              src={finalImage}
               alt={hit.title}
               className="h-auto w-full object-cover rounded-md"
             />
